@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Dither from '@/components/Dither';
 import { MiniMapView } from '@/components/MiniMapView';
+import BlurText from '@/components/BlurText';
+import CountUp from '@/components/CountUp';
+import SplitText from '@/components/SplitText';
 
 export default function Home() {
   const router = useRouter();
@@ -43,7 +46,16 @@ export default function Home() {
               }}
             >
               <h1 className="text-2xl font-mono font-bold text-cyan-300 tracking-wider">
-                ALGOVIBE
+                <SplitText
+                  text="ALGOVIBE"
+                  className="text-2xl font-mono font-bold text-cyan-300 tracking-wider"
+                  delay={0.5}
+                  duration={1}
+                  ease="power2.out"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 20 }}
+                  to={{ opacity: 1, y: 0 }}
+                />
               </h1>
             </div>
 
@@ -82,16 +94,40 @@ export default function Home() {
                 }}
               >
                 <h2 className="text-5xl md:text-6xl font-mono font-bold text-white mb-4 leading-tight">
-                  Visualize
+                  <SplitText
+                    text="Visualize"
+                    className="text-5xl md:text-6xl font-mono font-bold text-white leading-tight"
+                    delay={1}
+                    duration={1.2}
+                    ease="power2.out"
+                    splitType="chars"
+                    from={{ opacity: 0, x: -50 }}
+                    to={{ opacity: 1, x: 0 }}
+                  />
                   <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
-                    Algorithms
+                  <span>
+                    <SplitText
+                      text="Algorithms"
+                      className="text-5xl md:text-6xl font-mono font-bold leading-tight"
+                      delay={1.5}
+                      duration={1.2}
+                      ease="power2.out"
+                      splitType="chars"
+                      from={{ opacity: 0, x: 50 }}
+                      to={{ opacity: 1, x: 0 }}
+                    />
                   </span>
                 </h2>
-                <p className="text-lg text-gray-300 font-mono leading-relaxed">
-                  Transform complex DSA problems into stunning 3D interactive experiences.
-                  Learn by seeing, explore by doing.
-                </p>
+                <BlurText
+                  text="Transform complex DSA problems into stunning 3D interactive experiences. Learn by seeing, explore by doing."
+                  className="text-lg text-gray-300 font-mono leading-relaxed"
+                  delay={2}
+                  animateBy="words"
+                  direction="top"
+                  threshold={0.1}
+                  animationFrom={{ opacity: 0, filter: 'blur(10px)' }}
+                  animationTo={[{ opacity: 1, filter: 'blur(0px)' }]}
+                />
               </div>
 
               <div className="flex gap-4">
@@ -158,7 +194,16 @@ export default function Home() {
                     clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  <div className="text-2xl font-mono font-bold text-cyan-400">50+</div>
+                  <div className="text-2xl font-mono font-bold text-cyan-400">
+                    <CountUp
+                      to={50}
+                      duration={2}
+                      delay={2.5}
+                      separator=""
+                      className="text-2xl font-mono font-bold text-cyan-400"
+                    />
+                    +
+                  </div>
                   <div className="text-xs font-mono text-cyan-300/70">Algorithms</div>
                 </div>
                 <div
@@ -167,7 +212,18 @@ export default function Home() {
                     clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  <div className="text-2xl font-mono font-bold text-purple-400">3D</div>
+                  <div className="text-2xl font-mono font-bold text-purple-400">
+                    <SplitText
+                      text="3D"
+                      className="text-2xl font-mono font-bold text-purple-400"
+                      delay={3}
+                      duration={1}
+                      ease="power2.out"
+                      splitType="chars"
+                      from={{ opacity: 0, scale: 0.5 }}
+                      to={{ opacity: 1, scale: 1 }}
+                    />
+                  </div>
                   <div className="text-xs font-mono text-purple-300/70">Visualizations</div>
                 </div>
                 <div
@@ -176,29 +232,24 @@ export default function Home() {
                     clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  <div className="text-2xl font-mono font-bold text-pink-400">∞</div>
+                  <div className="text-2xl font-mono font-bold text-pink-400">
+                    <SplitText
+                      text="∞"
+                      className="text-2xl font-mono font-bold text-pink-400"
+                      delay={3.5}
+                      duration={1}
+                      ease="power2.out"
+                      splitType="chars"
+                      from={{ opacity: 0, rotate: -180 }}
+                      to={{ opacity: 1, rotate: 0 }}
+                    />
+                  </div>
                   <div className="text-xs font-mono text-pink-300/70">Possibilities</div>
                 </div>
               </div>
             </div>
           </div>
         </main>
-
-        {/* Footer */}
-        <footer className="p-6">
-          <div className="max-w-7xl mx-auto">
-            <div
-              className="bg-black/40 backdrop-blur-md border-2 border-purple-400/50 px-6 py-4 text-center"
-              style={{
-                clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px))',
-              }}
-            >
-              <p className="font-mono text-purple-300 text-sm">
-                Built for hackathons • Powered by Next.js + Three.js • Made with ❤️
-              </p>
-            </div>
-          </div>
-        </footer>
       </div>
 
       {/* Ambient glow effects */}
