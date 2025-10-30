@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
 import { SubaruCharacter } from './SubaruCharacter';
+import { RoadSystem } from './RoadSystem';
 import { Suspense } from 'react';
 
 export function Scene3D() {
@@ -14,44 +15,47 @@ export function Scene3D() {
           antialias: false,
           alpha: true,
         }}
-        style={{ 
-          imageRendering: 'pixelated',
-          imageRendering: 'crisp-edges' as any,
-        }}
       >
-        <PerspectiveCamera makeDefault position={[0, 1, 5]} fov={50} />
+        <PerspectiveCamera makeDefault position={[0, 3, 10]} fov={65} />
         
         {/* Lighting */}
-        <ambientLight intensity={0.6} />
+        <ambientLight intensity={0.4} />
         <directionalLight
-          position={[5, 5, 5]}
-          intensity={1}
+          position={[5, 8, 5]}
+          intensity={1.5}
           castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
         />
-        <pointLight position={[-5, 5, 5]} intensity={0.5} color="#88ccff" />
-        <pointLight position={[5, -5, -5]} intensity={0.3} color="#ff88cc" />
+        <pointLight position={[-5, 5, -5]} intensity={0.5} color="#88ccff" />
+        <pointLight position={[5, 3, 5]} intensity={0.4} color="#ff88cc" />
+        
+        {/* Rim light from behind */}
+        <pointLight position={[0, 4, -8]} intensity={0.8} color="#8888ff" />
         
         <Suspense fallback={null}>
-          <SubaruCharacter />
+          <RoadSystem />
+          <SubaruCharacter isRunning={true} />
         </Suspense>
         
         <OrbitControls
-          enableZoom={false}
+          enableZoom={true}
           enablePan={false}
-          minPolarAngle={Math.PI / 3}
-          maxPolarAngle={Math.PI / 2}
+          minDistance={6}
+          maxDistance={20}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 2.2}
+          target={[0, 0, 0]}
         />
         
-        {/* Pixel grid floor effect */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
-          <planeGeometry args={[20, 20, 20, 20]} />
-          <meshStandardMaterial 
-            color="#1a1a2e"
-            wireframe
-            transparent
-            opacity={0.3}
-          />
+        {/* Background gradient plane */}
+        <mesh position={[0, 0, -50]} rotation={[0, 0, 0]}>
+          <planeGeometry args={[100, 100]} />
+          <meshBasicMaterial color="#0a0a1a" />
         </mesh>
+        
+        {/* Fog for depth */}
+        <fog attach="fog" args={['#0f0f1e', 10, 50]} />
       </Canvas>
     </div>
   );

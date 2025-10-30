@@ -5,17 +5,47 @@ import { useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 
-export function SubaruCharacter() {
+interface SubaruCharacterProps {
+  isRunning?: boolean;
+  pathProgress?: number;
+}
+
+export function SubaruCharacter({ isRunning = true, pathProgress = 0 }: SubaruCharacterProps) {
   const group = useRef<THREE.Group>(null);
+  const leftLegRef = useRef<THREE.Group>(null);
+  const rightLegRef = useRef<THREE.Group>(null);
+  const leftArmRef = useRef<THREE.Group>(null);
+  const rightArmRef = useRef<THREE.Group>(null);
   
   // Create a simple anime-style character using primitive shapes
   useFrame((state) => {
     if (group.current) {
-      // Gentle floating animation
-      group.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
-      
-      // Subtle rotation
-      group.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+      if (isRunning) {
+        // Running animation - bob up and down
+        group.current.position.y = Math.abs(Math.sin(state.clock.elapsedTime * 8)) * 0.15 - 1;
+        
+        // Animate legs for running
+        if (leftLegRef.current && rightLegRef.current) {
+          const legSwing = Math.sin(state.clock.elapsedTime * 8) * 0.6;
+          leftLegRef.current.rotation.x = legSwing;
+          rightLegRef.current.rotation.x = -legSwing;
+        }
+        
+        // Animate arms for running (opposite of legs)
+        if (leftArmRef.current && rightArmRef.current) {
+          const armSwing = Math.sin(state.clock.elapsedTime * 8) * 0.4;
+          leftArmRef.current.rotation.x = -armSwing;
+          rightArmRef.current.rotation.x = armSwing;
+        }
+        
+        // Slight forward lean when running
+        group.current.rotation.x = 0.1;
+      } else {
+        // Idle floating animation
+        group.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.1 - 1;
+        group.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+        group.current.rotation.x = 0;
+      }
     }
   });
 
@@ -78,47 +108,55 @@ export function SubaruCharacter() {
       {/* Arms */}
       <group>
         {/* Left arm */}
-        <mesh position={[-0.7, 0.9, 0]} rotation={[0, 0, Math.PI * 0.1]}>
-          <boxGeometry args={[0.3, 1.2, 0.3]} />
-          <meshStandardMaterial color="#f5f5f5" />
-        </mesh>
-        <mesh position={[-0.8, 0.2, 0]}>
-          <boxGeometry args={[0.25, 0.6, 0.25]} />
-          <meshStandardMaterial color="#ffdfc4" />
-        </mesh>
+        <group ref={leftArmRef} position={[-0.7, 0.9, 0]}>
+          <mesh rotation={[0, 0, Math.PI * 0.1]}>
+            <boxGeometry args={[0.3, 1.2, 0.3]} />
+            <meshStandardMaterial color="#f5f5f5" />
+          </mesh>
+          <mesh position={[-0.1, -0.7, 0]}>
+            <boxGeometry args={[0.25, 0.6, 0.25]} />
+            <meshStandardMaterial color="#ffdfc4" />
+          </mesh>
+        </group>
         
         {/* Right arm */}
-        <mesh position={[0.7, 0.9, 0]} rotation={[0, 0, -Math.PI * 0.1]}>
-          <boxGeometry args={[0.3, 1.2, 0.3]} />
-          <meshStandardMaterial color="#f5f5f5" />
-        </mesh>
-        <mesh position={[0.8, 0.2, 0]}>
-          <boxGeometry args={[0.25, 0.6, 0.25]} />
-          <meshStandardMaterial color="#ffdfc4" />
-        </mesh>
+        <group ref={rightArmRef} position={[0.7, 0.9, 0]}>
+          <mesh rotation={[0, 0, -Math.PI * 0.1]}>
+            <boxGeometry args={[0.3, 1.2, 0.3]} />
+            <meshStandardMaterial color="#f5f5f5" />
+          </mesh>
+          <mesh position={[0.1, -0.7, 0]}>
+            <boxGeometry args={[0.25, 0.6, 0.25]} />
+            <meshStandardMaterial color="#ffdfc4" />
+          </mesh>
+        </group>
       </group>
       
       {/* Legs */}
       <group>
         {/* Left leg */}
-        <mesh position={[-0.3, -0.3, 0]}>
-          <boxGeometry args={[0.4, 1.4, 0.4]} />
-          <meshStandardMaterial color="#2a2a2a" />
-        </mesh>
-        <mesh position={[-0.3, -1.2, 0]}>
-          <boxGeometry args={[0.45, 0.3, 0.6]} />
-          <meshStandardMaterial color="#1a1a1a" />
-        </mesh>
+        <group ref={leftLegRef} position={[-0.3, 0.4, 0]}>
+          <mesh position={[0, -0.7, 0]}>
+            <boxGeometry args={[0.4, 1.4, 0.4]} />
+            <meshStandardMaterial color="#2a2a2a" />
+          </mesh>
+          <mesh position={[0, -1.6, 0]}>
+            <boxGeometry args={[0.45, 0.3, 0.6]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
         
         {/* Right leg */}
-        <mesh position={[0.3, -0.3, 0]}>
-          <boxGeometry args={[0.4, 1.4, 0.4]} />
-          <meshStandardMaterial color="#2a2a2a" />
-        </mesh>
-        <mesh position={[0.3, -1.2, 0]}>
-          <boxGeometry args={[0.45, 0.3, 0.6]} />
-          <meshStandardMaterial color="#1a1a1a" />
-        </mesh>
+        <group ref={rightLegRef} position={[0.3, 0.4, 0]}>
+          <mesh position={[0, -0.7, 0]}>
+            <boxGeometry args={[0.4, 1.4, 0.4]} />
+            <meshStandardMaterial color="#2a2a2a" />
+          </mesh>
+          <mesh position={[0, -1.6, 0]}>
+            <boxGeometry args={[0.45, 0.3, 0.6]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
       </group>
       
       {/* Shadow below */}

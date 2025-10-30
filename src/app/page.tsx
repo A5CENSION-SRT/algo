@@ -1,6 +1,7 @@
 'use client';
 
 import { Scene3D } from '@/components/Scene3D';
+import { Minimap } from '@/components/Minimap';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -93,17 +94,23 @@ export default function Home() {
         </div>
       ) : (
         <div className="relative z-10 min-h-screen flex flex-col">
+          {/* HUD Header */}
           <div className="p-6 flex justify-between items-start flex-wrap gap-4">
             <div 
               className="bg-black/50 backdrop-blur-sm border-2 border-cyan-400 px-6 py-3"
               style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)' }}
             >
               <h2 className="text-2xl font-mono font-bold text-cyan-300 tracking-wider">
-                SUBARU NATSUKI
+                ALGO VISUALIZER
               </h2>
               <p className="text-sm text-purple-300 font-mono mt-1">
-                Return by Death: ∞
+                Running Algorithm: Loop Iteration ∞
               </p>
+            </div>
+            
+            {/* Minimap in top right */}
+            <div className="absolute top-6 right-6 z-20">
+              <Minimap />
             </div>
             
             <div 
@@ -111,16 +118,17 @@ export default function Home() {
               style={{ clipPath: 'polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 15px)' }}
             >
               <p className="text-lg font-mono text-pink-300 tracking-wider">
-                HP: ❤️❤️❤️❤️❤️
+                Speed: ⚡⚡⚡⚡⚡
               </p>
             </div>
           </div>
 
-          <div className="flex-1 relative">
+          {/* 3D Character Scene - LARGER */}
+          <div className="flex-1 relative min-h-[70vh]">
             <Scene3D />
             
             <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider">
-              SUBARU
+              RUNNING ON PATH...
             </div>
           </div>
 
@@ -129,19 +137,22 @@ export default function Home() {
               className="bg-black/60 backdrop-blur-sm border-2 border-green-400 p-4 max-w-4xl mx-auto"
               style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)' }}
             >
-              <p className="font-mono text-green-300 text-lg leading-relaxed">
-                <span className="text-yellow-300">▶</span> Welcome to the game world! 
-                Use your mouse to rotate the camera and explore.
+              <p className="font-mono text-green-300 text-lg leading-relaxed mb-2">
+                <span className="text-yellow-300">▶</span> Algorithm Visualization Mode Active!
+              </p>
+              <p className="font-mono text-cyan-300 text-sm leading-relaxed">
+                Subaru is running on an infinite road - simulating continuous iteration through data structures. 
+                The scrolling road represents traversing through arrays, linked lists, or graph paths.
               </p>
               <div className="flex gap-4 mt-3 justify-center flex-wrap">
                 <div className="px-4 py-2 bg-blue-600/50 border border-blue-400 font-mono text-sm">
-                  [EXPLORE]
+                  [ARRAY TRAVERSAL]
                 </div>
                 <div className="px-4 py-2 bg-purple-600/50 border border-purple-400 font-mono text-sm">
-                  [INTERACT]
+                  [GRAPH SEARCH]
                 </div>
                 <div className="px-4 py-2 bg-red-600/50 border border-red-400 font-mono text-sm">
-                  [SAVE POINT]
+                  [PATH FINDING]
                 </div>
               </div>
             </div>
