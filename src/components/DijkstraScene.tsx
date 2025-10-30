@@ -1,0 +1,257 @@
+'use client';
+
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
+import { Suspense, useState, useCallback } from 'react';
+import { DijkstraVisualization } from './DijkstraVisualization';
+import { CharacterWithMovement } from './CharacterWithMovement';
+import { AudioManager } from './AudioManager';
+import { DijkstraMinimap } from './DijkstraMinimap';
+
+interface Node {
+  id: string;
+  position: [number, number, number];
+  distance: number;
+  visited: boolean;
+  isTarget: boolean;
+  isStart: boolean;
+}
+
+interface Edge {
+  from: string;
+  to: string;
+  weight: number;
+}
+
+export function DijkstraScene() {
+  const [lives, setLives] = useState(3);
+  const [isDead, setIsDead] = useState(false);
+  const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-8, 0, 0]);
+  const [isAlgorithmActive, setIsAlgorithmActive] = useState(true);
+  
+  // Minimap data
+  const [minimapNodes, setMinimapNodes] = useState<any[]>([]);
+  const [minimapEdges, setMinimapEdges] = useState<any[]>([]);
+  const [minimapCurrentNode, setMinimapCurrentNode] = useState<string>('Arlam');
+
+  const handleLoseLife = useCallback(() => {
+    setLives(prev => {
+      const newLives = prev - 1;
+      if (newLives <= 0) {
+        setIsDead(true);
+      }
+      return newLives;
+    });
+  }, []);
+
+  const handleReachTarget = useCallback(() => {
+    console.log('Target reached!');
+    // You can add victory logic here
+  }, []);
+
+  const handleWrongPath = useCallback(() => {
+    handleLoseLife();
+  }, [handleLoseLife]);
+
+  const handleResetAfterDeath = useCallback(() => {
+    setIsDead(false);
+    setLives(3);
+    setTargetPosition([-8, 0, 0]);
+    setIsAlgorithmActive(true);
+  }, []);
+
+  const handleNodeReached = useCallback(() => {
+    console.log('Node reached');
+  }, []);
+
+  const handleNodesUpdate = useCallback((nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>) => {
+    // Convert 3D positions to 2D for minimap
+    const minimapNodesData = nodes.map(node => ({
+      id: node.id,
+      x: node.position[0],
+      y: node.position[2],
+      visited: node.visited,
+      isStart: node.isStart,
+      isTarget: node.isTarget,
+      isCurrent: node.id === currentNode
+    }));
+
+    const minimapEdgesData = edges.map(edge => ({
+      from: edge.from,
+      to: edge.to,
+      isVisited: visitedNodes.has(edge.from) && visitedNodes.has(edge.to)
+    }));
+
+    setMinimapNodes(minimapNodesData);
+    setMinimapEdges(minimapEdgesData);
+    setMinimapCurrentNode(currentNode);
+  }, []);
+
+  return (
+    <>
+      <AudioManager 
+        isPlaying={isAlgorithmActive} 
+        onDeath={isDead}
+        onReset={handleResetAfterDeath}
+      />
+      
+      <Canvas
+        shadows
+        gl={{ 
+          antialias: true,
+          alpha: true,
+        }}
+      >
+        <PerspectiveCamera makeDefault position={[0, 12, 12]} fov={60} />
+        
+        {/* Sky background */}
+        <Sky
+          distance={450000}
+          sunPosition={[100, 20, 100]}
+          inclination={0.49}
+          azimuth={0.25}
+        />
+        
+        {/* Lighting */}
+        <ambientLight intensity={0.6} />
+        <directionalLight
+          position={[10, 20, 10]}
+          intensity={1.2}
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          shadow-camera-far={50}
+          shadow-camera-left={-20}
+          shadow-camera-right={20}
+          shadow-camera-top={20}
+          shadow-camera-bottom={-20}
+        />
+        <hemisphereLight
+          color="#87CEEB"
+          groundColor="#5d4e37"
+          intensity={0.6}
+        />
+        <pointLight position={[-10, 8, -10]} intensity={0.4} color="#ffeeaa" />
+        <pointLight position={[10, 8, -10]} intensity={0.4} color="#aaeeff" />
+        
+        <Suspense fallback={null}>
+          {/* Dijkstra Graph Visualization */}
+          <DijkstraVisualization 
+            onLoseLife={handleLoseLife}
+            onReachTarget={handleReachTarget}
+            isActive={isAlgorithmActive}
+            onNodesUpdate={handleNodesUpdate}
+          />
+          
+          {/* Character that moves between nodes */}
+          <CharacterWithMovement 
+            isRunning={true}
+            targetPosition={targetPosition}
+            onReachTarget={handleNodeReached}
+            onWrongPath={handleWrongPath}
+          />
+
+          {/* Ground plane - grass/forest floor */}
+          <mesh 
+            rotation={[-Math.PI / 2, 0, 0]} 
+            position={[0, -2.5, -3]} 
+            receiveShadow
+          >
+            <planeGeometry args={[40, 40]} />
+            <meshStandardMaterial 
+              color="#4a6741" 
+              roughness={0.9}
+              metalness={0.1}
+            />
+          </mesh>
+
+          {/* Forest trees in background */}
+          {[...Array(20)].map((_, i) => {
+            const angle = (i / 20) * Math.PI * 2;
+            const radius = 15 + Math.random() * 5;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const height = 3 + Math.random() * 2;
+            
+            return (
+              <group key={i} position={[x, -2.5, z]}>
+                {/* Tree trunk */}
+                <mesh castShadow>
+                  <cylinderGeometry args={[0.3, 0.4, height, 8]} />
+                  <meshStandardMaterial color="#4a3829" />
+                </mesh>
+                {/* Tree foliage */}
+                <mesh position={[0, height / 2 + 1, 0]} castShadow>
+                  <coneGeometry args={[1.5, 3, 8]} />
+                  <meshStandardMaterial color="#2d5016" />
+                </mesh>
+              </group>
+            );
+          })}
+
+          {/* Grid helper for spatial awareness (subtle) */}
+          <gridHelper 
+            args={[40, 40, '#6b8e63', '#4a6741']} 
+            position={[0, -2.4, -3]} 
+          />
+        </Suspense>
+        
+        <OrbitControls
+          enableZoom={true}
+          enablePan={true}
+          minDistance={10}
+          maxDistance={30}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2.5}
+          target={[0, 0, -3]}
+        />
+        
+        {/* Atmospheric fog */}
+        <fog attach="fog" args={['#d4e4f7', 20, 70]} />
+      </Canvas>
+
+      {/* Minimap */}
+      <div className="absolute top-6 right-6 z-20 pointer-events-none">
+        <div 
+          className="bg-black/70 backdrop-blur-sm border-2 border-cyan-400 p-2"
+          style={{ clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)' }}
+        >
+          <DijkstraMinimap 
+            nodes={minimapNodes}
+            edges={minimapEdges}
+            currentNode={minimapCurrentNode}
+          />
+          <p className="text-xs text-cyan-300 font-mono mt-2 text-center">
+            MAP OF LUGNICA
+          </p>
+        </div>
+      </div>
+
+      {/* Lives Display */}
+      <div className="absolute top-40 left-6 z-20 pointer-events-none">
+        <div 
+          className="bg-black/50 backdrop-blur-sm border-2 border-red-400 px-6 py-3"
+          style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)' }}
+        >
+          <p className="text-xl font-mono text-red-300 tracking-wider">
+            LIVES: {'❤️'.repeat(lives)} {lives === 0 && '💀'}
+          </p>
+        </div>
+      </div>
+
+      {/* Death Overlay */}
+      {isDead && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <div className="text-center space-y-6">
+            <h1 className="text-6xl font-bold text-red-500 font-mono animate-pulse">
+              RETURN BY DEATH
+            </h1>
+            <p className="text-2xl text-white font-mono">
+              Resetting timeline...
+            </p>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

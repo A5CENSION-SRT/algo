@@ -27,7 +27,7 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
 
         <button
           onClick={onStart}
-          className="group relative mt-12 px-16 py-6 text-2xl font-bold font-mono tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transition-all duration-300 transform hover:scale-110 hover:rotate-1 border-4 border-white shadow-2xl active:scale-95"
+          className="group relative mt-12 px-16 py-6 text-2xl font-bold font-mono tracking-widest bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transition-all duration-300 transform hover:scale-110 hover:rotate-1 border-4 border-white shadow-2xl active:scale-95"
           style={{
             clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
           }}

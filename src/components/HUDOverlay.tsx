@@ -1,6 +1,14 @@
 'use client';
 
-export function HUDOverlay() {
+interface HUDOverlayProps {
+  algorithmName?: string;
+  currentStep?: string;
+}
+
+export function HUDOverlay({ 
+  algorithmName = "Loop Iteration ∞",
+  currentStep = "Running..."
+}: HUDOverlayProps) {
   return (
     <>
       {/* Top Left HUD */}
@@ -13,7 +21,10 @@ export function HUDOverlay() {
             ALGO VISUALIZER
           </h2>
           <p className="text-sm text-purple-300 font-mono mt-1">
-            Running Algorithm: Loop Iteration ∞
+            Running Algorithm: {algorithmName}
+          </p>
+          <p className="text-xs text-green-300 font-mono mt-1">
+            Status: {currentStep}
           </p>
         </div>
       </div>
