@@ -5,11 +5,9 @@ import { DijkstraScene } from '@/components/DijkstraScene';
 import { MinimapOverlay } from '@/components/MinimapOverlay';
 import { HUDOverlay } from '@/components/HUDOverlay';
 import { BottomUIOverlay } from '@/components/BottomUIOverlay';
-import { StartScreen } from '@/components/StartScreen';
 import { useState, useEffect } from 'react';
 
 export default function ExperiencePage() {
-    const [started, setStarted] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const [mode, setMode] = useState<'infinite' | 'dijkstra'>('dijkstra');
 
@@ -48,51 +46,45 @@ export default function ExperiencePage() {
                 ))}
             </div>
 
-            {!started ? (
-                <StartScreen onStart={() => setStarted(true)} />
-            ) : (
-                <>
-                    {/* FULL SCREEN 3D SCENE */}
-                    <div className="absolute inset-0 w-full h-full">
-                        {mode === 'infinite' ? <MainScene /> : <DijkstraScene />}
-                    </div>
+            {/* FULL SCREEN 3D SCENE */}
+            <div className="absolute inset-0 w-full h-full">
+                {mode === 'infinite' ? <MainScene /> : <DijkstraScene />}
+            </div>
 
-                    {/* OVERLAYS - All positioned absolutely on top of 3D scene */}
-                    <HUDOverlay 
-                        algorithmName={mode === 'dijkstra' ? "Dijkstra's Algorithm" : "Loop Iteration ∞"}
-                        currentStep={mode === 'dijkstra' ? "Finding Shortest Path..." : "Running..."}
-                    />
-                    {mode === 'infinite' && <MinimapOverlay />}
-                    {mode === 'infinite' && <BottomUIOverlay />}
+            {/* OVERLAYS - All positioned absolutely on top of 3D scene */}
+            <HUDOverlay
+                algorithmName={mode === 'dijkstra' ? "Dijkstra's Algorithm" : "Loop Iteration ∞"}
+                currentStep={mode === 'dijkstra' ? "Finding Shortest Path..." : "Running..."}
+            />
+            {mode === 'infinite' && <MinimapOverlay />}
+            {mode === 'infinite' && <BottomUIOverlay />}
 
-                    {/* Mode Toggle */}
-                    <div className="absolute top-32 left-6 z-20">
-                        <div 
-                            className="bg-black/50 backdrop-blur-sm border-2 border-yellow-400 px-4 py-2"
-                            style={{ clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)' }}
-                        >
-                            <button
-                                onClick={() => setMode(mode === 'infinite' ? 'dijkstra' : 'infinite')}
-                                className="font-mono text-yellow-300 hover:text-yellow-100 transition-colors"
-                            >
-                                {mode === 'infinite' ? '🎯 Switch to Dijkstra' : '🏃 Switch to Infinite Run'}
-                            </button>
-                        </div>
-                    </div>
+            {/* Mode Toggle */}
+            <div className="absolute top-32 left-6 z-20">
+                <div
+                    className="bg-black/50 backdrop-blur-sm border-2 border-yellow-400 px-4 py-2"
+                    style={{ clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)' }}
+                >
+                    <button
+                        onClick={() => setMode(mode === 'infinite' ? 'dijkstra' : 'infinite')}
+                        className="font-mono text-yellow-300 hover:text-yellow-100 transition-colors"
+                    >
+                        {mode === 'infinite' ? '🎯 Switch to Dijkstra' : '🏃 Switch to Infinite Run'}
+                    </button>
+                </div>
+            </div>
 
-                    {/* Center status text overlay */}
-                    {mode === 'dijkstra' && (
-                        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
-                            FINDING SHORTEST PATH...
-                        </div>
-                    )}
+            {/* Center status text overlay */}
+            {mode === 'dijkstra' && (
+                <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
+                    FINDING SHORTEST PATH...
+                </div>
+            )}
 
-                    {mode === 'infinite' && (
-                        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
-                            RUNNING ON PATH...
-                        </div>
-                    )}
-                </>
+            {mode === 'infinite' && (
+                <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
+                    RUNNING ON PATH...
+                </div>
             )}
         </div>
     );
