@@ -40,6 +40,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
   const [algorithmStep, setAlgorithmStep] = useState(0);
   const [visitedNodes, setVisitedNodes] = useState<Set<string>>(new Set());
   const [shortestPath, setShortestPath] = useState<string[]>([]); // Current shortest path
+  const [relaxingNeighborId, setRelaxingNeighborId] = useState<string | null>(null);
 
   // Initialize graph structure
   useEffect(() => {
@@ -65,49 +66,54 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
     if (!isActive || nodes.length === 0) return;
 
     const interval = setInterval(() => {
-      setNodes((prevNodes) => {
+      setNodes(prevNodes => {
         const unvisited = prevNodes.filter(n => !n.visited);
         if (unvisited.length === 0) return prevNodes;
 
-        // Find node with minimum distance
-        const minNode = unvisited.reduce((min, node) => 
+        const minNode = unvisited.reduce((min, node) =>
           node.distance < min.distance ? node : min
         );
 
         if (minNode.distance === Infinity) return prevNodes;
 
-        // Mark as visited
-        const updatedNodes = prevNodes.map(node => 
+        const updatedNodes = prevNodes.map(node =>
           node.id === minNode.id ? { ...node, visited: true } : node
         );
 
         setCurrentNode(minNode.id);
         setVisitedNodes(prev => new Set([...prev, minNode.id]));
 
-        // Check if reached target
         if (minNode.isTarget) {
           onReachTarget();
           return updatedNodes;
         }
 
-        // Update distances of neighbors
         const neighbors = edges.filter(e => e.from === minNode.id);
-        
-        return updatedNodes.map(node => {
-          const edge = neighbors.find(e => e.to === node.id);
-          if (edge && !node.visited) {
-            const newDistance = minNode.distance + edge.weight;
-            if (newDistance < node.distance) {
-              // Update distance and track previous node for path reconstruction
-              return { ...node, distance: newDistance, previousNode: minNode.id };
-            }
-          }
-          return node;
+        neighbors.forEach((edge, index) => {
+          const delayMs = 500 * index;
+          setTimeout(() => {
+            setRelaxingNeighborId(edge.to);
+            setNodes(pn => pn.map(node => {
+              if (node.id !== edge.to || node.visited) return node;
+              const newDistance = minNode.distance + edge.weight;
+              if (newDistance < node.distance) {
+                return { ...node, distance: newDistance, previousNode: minNode.id };
+              }
+              return node;
+            }));
+          }, delayMs);
         });
-      });
 
-      setAlgorithmStep(prev => prev + 1);
-    }, 2000); // Update every 2 seconds
+        if (neighbors.length > 0) {
+          setTimeout(() => setRelaxingNeighborId(null), 500 * neighbors.length + 50);
+        } else {
+          setRelaxingNeighborId(null);
+        }
+
+        setAlgorithmStep(prev => prev + 1);
+        return updatedNodes;
+      });
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isActive, nodes.length, edges, onReachTarget]);
@@ -179,8 +185,8 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           
           {/* Village name label above */}
           <Text
-            position={[0, 2.2, 0]}
-            fontSize={0.45}
+            position={[0, 2.6, 0]}
+            fontSize={0.5}
             color={node.isStart ? '#00ff00' : node.isTarget ? '#ff0000' : '#ffffff'}
             anchorX="center"
             anchorY="middle"
@@ -207,25 +213,23 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
             </>
           )}
 
-          {/* Distance indicator */}
-          {node.distance !== Infinity && (
-            <Text
-              position={[0, -1, 0]}
-              fontSize={0.35}
-              color="#ffff00"
-              anchorX="center"
-              anchorY="middle"
-              outlineWidth={0.02}
-              outlineColor="#000000"
-            >
-              Distance: {node.distance} km
-            </Text>
-          )}
+          {/* Distance indicator - show ∞ initially and update as algorithm progresses */}
+          <Text
+            position={[0, 2.1, 0]}
+            fontSize={0.4}
+            color={node.distance === Infinity ? '#cccccc' : '#ffff00'}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.02}
+            outlineColor="#000000"
+          >
+            Distance: {node.distance === Infinity ? '-∞' : `${node.distance}`} km
+          </Text>
 
           {/* Visited checkmark */}
           {node.visited && (
             <Text
-              position={[0, 2.8, 0]}
+              position={[0, 3.2, 0]}
               fontSize={0.5}
               color="#00ff00"
               anchorX="center"
@@ -233,6 +237,14 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
             >
               ✓
             </Text>
+          )}
+
+          {/* Highlight neighbor currently being relaxed */}
+          {relaxingNeighborId === node.id && (
+            <mesh position={[0, -0.15, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[1.0, 1.25, 32]} />
+              <meshBasicMaterial color="#ffff00" transparent opacity={0.7} />
+            </mesh>
           )}
         </group>
       ))}

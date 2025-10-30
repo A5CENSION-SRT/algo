@@ -9,13 +9,15 @@ interface CharacterWithMovementProps {
   targetPosition: [number, number, number];
   onReachTarget: () => void;
   onWrongPath: () => void;
+  speed?: number; // units per frame step
 }
 
 export function CharacterWithMovement({ 
   isRunning = true, 
   targetPosition,
   onReachTarget,
-  onWrongPath
+  onWrongPath,
+  speed = 0.08
 }: CharacterWithMovementProps) {
   const group = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
@@ -24,7 +26,7 @@ export function CharacterWithMovement({
   const rightArmRef = useRef<THREE.Group>(null);
   
   const [isMoving, setIsMoving] = useState(false);
-  const moveSpeed = 0.1; // Faster to complete movement in ~2 seconds between nodes
+  const moveSpeed = speed; // configurable
 
   useEffect(() => {
     if (group.current) {
@@ -48,18 +50,19 @@ export function CharacterWithMovement({
     if (group.current) {
       if (isRunning) {
         // Running animation - bob up and down
-        const bobOffset = Math.abs(Math.sin(state.clock.elapsedTime * 8)) * 0.15;
+        const rate = 6 + Math.min(10, Math.max(0, speed * 40));
+        const bobOffset = Math.abs(Math.sin(state.clock.elapsedTime * rate)) * 0.15;
         
         // Animate legs for running
         if (leftLegRef.current && rightLegRef.current) {
-          const legSwing = Math.sin(state.clock.elapsedTime * 8) * 0.6;
+          const legSwing = Math.sin(state.clock.elapsedTime * rate) * 0.6;
           leftLegRef.current.rotation.x = legSwing;
           rightLegRef.current.rotation.x = -legSwing;
         }
         
         // Animate arms for running (opposite of legs)
         if (leftArmRef.current && rightArmRef.current) {
-          const armSwing = Math.sin(state.clock.elapsedTime * 8) * 0.4;
+          const armSwing = Math.sin(state.clock.elapsedTime * rate) * 0.4;
           leftArmRef.current.rotation.x = -armSwing;
           rightArmRef.current.rotation.x = armSwing;
         }
