@@ -22,9 +22,10 @@ interface DijkstraMinimapProps {
   nodes: MinimapNode[];
   edges: MinimapEdge[];
   currentNode: string;
+  shortestPath?: string[];
 }
 
-export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapProps) {
+export function DijkstraMinimap({ nodes, edges, currentNode, shortestPath = [] }: DijkstraMinimapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -60,24 +61,63 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
     const offsetX = canvas.width / 2;
     const offsetY = canvas.height / 2;
 
-    // Draw edges first
+    // Helper function to check if edge is in shortest path
+    const isInShortestPath = (from: string, to: string): boolean => {
+      for (let i = 0; i < shortestPath.length - 1; i++) {
+        if ((shortestPath[i] === from && shortestPath[i + 1] === to) ||
+            (shortestPath[i] === to && shortestPath[i + 1] === from)) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Draw edges first (non-shortest path)
     edges.forEach(edge => {
       const fromNode = nodes.find(n => n.id === edge.from);
       const toNode = nodes.find(n => n.id === edge.to);
       
       if (!fromNode || !toNode) return;
+      if (isInShortestPath(edge.from, edge.to)) return; // Skip shortest path edges for now
 
       const x1 = (fromNode.x - centerX) * scale + offsetX;
       const y1 = (fromNode.y - centerY) * scale + offsetY;
       const x2 = (toNode.x - centerX) * scale + offsetX;
       const y2 = (toNode.y - centerY) * scale + offsetY;
 
-      ctx.strokeStyle = edge.isVisited ? '#00ff00' : 'rgba(255, 255, 255, 0.3)';
-      ctx.lineWidth = edge.isVisited ? 2 : 1;
+      ctx.strokeStyle = edge.isVisited ? 'rgba(0, 255, 0, 0.4)' : 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
       ctx.stroke();
+    });
+
+    // Draw shortest path edges with better highlighting
+    edges.forEach(edge => {
+      const fromNode = nodes.find(n => n.id === edge.from);
+      const toNode = nodes.find(n => n.id === edge.to);
+      
+      if (!fromNode || !toNode) return;
+      if (!isInShortestPath(edge.from, edge.to)) return; // Only draw shortest path edges
+
+      const x1 = (fromNode.x - centerX) * scale + offsetX;
+      const y1 = (fromNode.y - centerY) * scale + offsetY;
+      const x2 = (toNode.x - centerX) * scale + offsetX;
+      const y2 = (toNode.y - centerY) * scale + offsetY;
+
+      // Draw glow effect
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      
+      // Reset shadow
+      ctx.shadowBlur = 0;
     });
 
     // Draw nodes
@@ -132,7 +172,7 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
       ctx.fill();
     }
 
-  }, [nodes, edges, currentNode]);
+  }, [nodes, edges, currentNode, shortestPath]);
 
   return (
     <canvas

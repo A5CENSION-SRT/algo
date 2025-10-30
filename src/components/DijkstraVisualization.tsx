@@ -27,7 +27,7 @@ interface DijkstraVisualizationProps {
   onLoseLife: () => void;
   onReachTarget: () => void;
   isActive: boolean;
-  onNodesUpdate?: (nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>) => void;
+  onNodesUpdate?: (nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>, shortestPath: string[]) => void;
   initialNodes?: Node[];
   initialEdges?: Edge[];
 }
@@ -130,9 +130,9 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
   // Notify parent component of updates for minimap
   useEffect(() => {
     if (onNodesUpdate) {
-      onNodesUpdate(nodes, currentNode, edges, visitedNodes);
+      onNodesUpdate(nodes, currentNode, edges, visitedNodes, shortestPath);
     }
-  }, [nodes, currentNode, edges, visitedNodes, onNodesUpdate]);
+  }, [nodes, currentNode, edges, visitedNodes, shortestPath, onNodesUpdate]);
 
   // Check if edge is part of current shortest path
   const isPathEdge = (from: string, to: string): boolean => {

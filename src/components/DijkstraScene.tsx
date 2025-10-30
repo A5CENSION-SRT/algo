@@ -44,6 +44,7 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
   const [minimapNodes, setMinimapNodes] = useState<any[]>([]);
   const [minimapEdges, setMinimapEdges] = useState<any[]>([]);
   const [minimapCurrentNode, setMinimapCurrentNode] = useState<string>('Arlam');
+  const [minimapShortestPath, setMinimapShortestPath] = useState<string[]>([]);
 
   const handleLoseLife = useCallback(() => {
     setLives(prev => {
@@ -75,7 +76,7 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
     console.log('Node reached');
   }, []);
 
-  const handleNodesUpdate = useCallback((nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>) => {
+  const handleNodesUpdate = useCallback((nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>, shortestPath: string[]) => {
     // Convert 3D positions to 2D for minimap
     const minimapNodesData = nodes.map(node => ({
       id: node.id,
@@ -96,6 +97,7 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
     setMinimapNodes(minimapNodesData);
     setMinimapEdges(minimapEdgesData);
     setMinimapCurrentNode(currentNode);
+    setMinimapShortestPath(shortestPath);
     
     // Update character target position to current node
     const currentNodeData = nodes.find(n => n.id === currentNode);
@@ -239,6 +241,7 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
             nodes={minimapNodes}
             edges={minimapEdges}
             currentNode={minimapCurrentNode}
+            shortestPath={minimapShortestPath}
           />
           <p className="text-xs text-cyan-300 font-mono mt-2 text-center">
             MAP OF LUGNICA
