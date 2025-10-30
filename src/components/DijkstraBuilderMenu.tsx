@@ -130,16 +130,19 @@ export function DijkstraBuilderMenu({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute left-6 top-1/2 -translate-y-1/2 z-20 bg-black/70 backdrop-blur-sm border-2 border-cyan-400 px-3 py-6 font-mono text-cyan-300 hover:bg-cyan-500/20 transition-colors"
+        className="absolute left-4 top-4 z-20 bg-gradient-to-r from-cyan-600 to-blue-600 backdrop-blur-sm border-2 border-cyan-300 px-4 py-6 font-mono text-white hover:from-cyan-500 hover:to-blue-500 transition-all shadow-lg hover:shadow-cyan-500/50 hover:scale-105 animate-slideInLeft"
         style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%)' }}
       >
-        <span className="writing-mode-vertical">OPEN BUILDER</span>
+        <div className="flex flex-col items-center space-y-1.5">
+          <span className="text-2xl">⚙️</span>
+          <span className="text-xs tracking-wider font-bold">BUILDER</span>
+        </div>
       </button>
     );
   }
 
   return (
-    <div className="absolute left-6 top-6 bottom-6 z-20 w-96 bg-[#0a1929]/95 backdrop-blur-lg border-2 border-cyan-400 overflow-hidden flex flex-col shadow-2xl"
+    <div className="absolute left-4 top-4 bottom-4 z-20 w-96 bg-[#0a1929]/95 backdrop-blur-lg border-2 border-cyan-400 overflow-hidden flex flex-col shadow-2xl animate-slideInLeft"
          style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%)' }}>
       
       {/* Header */}

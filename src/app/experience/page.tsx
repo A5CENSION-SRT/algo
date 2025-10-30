@@ -1,7 +1,6 @@
 'use client';
 
 import { DijkstraScene } from '@/components/DijkstraScene';
-import { HUDOverlay } from '@/components/HUDOverlay';
 import { DijkstraBuilderMenu } from '@/components/DijkstraBuilderMenu';
 import { useState, useEffect } from 'react';
 
@@ -147,12 +146,6 @@ export default function ExperiencePage() {
                 />
             </div>
 
-            {/* OVERLAYS - All positioned absolutely on top of 3D scene */}
-            <HUDOverlay
-                algorithmName="Dijkstra's Algorithm"
-                currentStep={isAlgorithmRunning ? "Finding Shortest Path..." : "Paused"}
-            />
-
             {/* Builder Menu */}
             <DijkstraBuilderMenu
                 nodes={nodes}
@@ -164,13 +157,6 @@ export default function ExperiencePage() {
                 onPauseAlgorithm={handlePauseAlgorithm}
                 isRunning={isAlgorithmRunning}
             />
-
-            {/* Center status text overlay */}
-            {isAlgorithmRunning && (
-                <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
-                    FINDING SHORTEST PATH...
-                </div>
-            )}
         </div>
     );
 }

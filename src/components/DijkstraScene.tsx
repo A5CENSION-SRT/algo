@@ -249,18 +249,6 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
         </div>
       </div>
 
-      {/* Lives Display */}
-      <div className="absolute top-40 left-6 z-20 pointer-events-none">
-        <div 
-          className="bg-black/50 backdrop-blur-sm border-2 border-red-400 px-6 py-3"
-          style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)' }}
-        >
-          <p className="text-xl font-mono text-red-300 tracking-wider">
-            LIVES: {'❤️'.repeat(lives)} {lives === 0 && '💀'}
-          </p>
-        </div>
-      </div>
-
       {/* Death Overlay */}
       {isDead && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/80 backdrop-blur-md">
