@@ -204,6 +204,17 @@ export default function Home() {
       {/* Ambient glow effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Background music */}
+      <audio
+        autoPlay
+        loop
+        muted
+        className="hidden"
+      >
+        <source src="/Sounds/Animation Musicals Network.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
     </div>
   );
 }
