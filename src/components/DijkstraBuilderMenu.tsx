@@ -330,26 +330,27 @@ export function DijkstraBuilderMenu({
 
             {/* Edge List */}
             <div className="space-y-2">
-              <h3 className="text-purple-300 font-mono text-sm font-bold">EXISTING ROADS</h3>
+              <h3 className="text-cyan-300/80 font-mono text-xs font-bold uppercase tracking-wider">EXISTING ROADS</h3>
               {edges.length === 0 ? (
-                <p className="text-gray-500 font-mono text-xs">No roads added yet</p>
+                <p className="text-gray-600 font-mono text-xs text-center py-4">No roads added yet</p>
               ) : (
                 edges.map((edge, idx) => (
                   <div
                     key={idx}
-                    className="bg-black/50 border border-purple-400/50 p-2 flex justify-between items-center"
+                    className="bg-black/40 border border-cyan-400/30 p-3 flex justify-between items-center hover:border-cyan-400/50 transition-colors"
                   >
                     <div className="flex-1">
-                      <div className="text-white font-mono text-sm">
+                      <div className="text-white font-mono text-sm font-medium">
                         {edge.from} → {edge.to}
                       </div>
-                      <div className="text-gray-400 font-mono text-xs">
+                      <div className="text-gray-500 font-mono text-xs mt-0.5">
                         Distance: {edge.weight} km
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveEdge(edge.from, edge.to)}
-                      className="text-red-400 hover:text-red-300 text-sm ml-2"
+                      className="text-red-500/70 hover:text-red-400 text-lg ml-2 transition-colors"
+                      aria-label="Delete"
                     >
                       ✕
                     </button>
@@ -362,37 +363,37 @@ export function DijkstraBuilderMenu({
       </div>
 
       {/* Footer with Action Buttons */}
-      <div className="border-t-2 border-cyan-400 p-4 space-y-3 bg-gradient-to-b from-black/50 to-black/80">
+      <div className="border-t border-cyan-400/40 p-4 space-y-2.5 bg-black/40">
         {/* Status Indicator */}
         {!canRunAlgorithm && (
-          <div className="bg-yellow-900/30 border border-yellow-600 px-3 py-2 rounded text-xs font-mono text-yellow-200">
-            <p className="font-bold">⚠️ Requirements:</p>
-            {!hasStartNode && <p className="text-xs">• Add a Start node 🏁</p>}
-            {!hasTargetNode && <p className="text-xs">• Add a Target node 🎯</p>}
-            {edges.length === 0 && <p className="text-xs">• Add at least one edge</p>}
+          <div className="bg-yellow-900/20 border border-yellow-600/40 px-3 py-2 text-xs font-mono text-yellow-300/90">
+            <p className="font-semibold mb-1">⚠️ Requirements:</p>
+            {!hasStartNode && <p className="text-xs opacity-80">• Add a Start node 🏁</p>}
+            {!hasTargetNode && <p className="text-xs opacity-80">• Add a Target node 🎯</p>}
+            {edges.length === 0 && <p className="text-xs opacity-80">• Add at least one edge</p>}
           </div>
         )}
         
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             onClick={onRunAlgorithm}
             disabled={isRunning || !canRunAlgorithm}
             title={!canRunAlgorithm ? 'Complete setup requirements first' : 'Start algorithm'}
-            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-mono font-bold text-sm py-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-green-500/50 rounded"
+            className="bg-green-600/90 hover:bg-green-500 text-white font-mono font-semibold text-sm py-2.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             ▶ RUN
           </button>
           <button
             onClick={onPauseAlgorithm}
             disabled={!isRunning}
-            className="bg-gradient-to-r from-yellow-600 to-orange-500 hover:from-yellow-500 hover:to-orange-400 text-white font-mono font-bold text-sm py-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg rounded"
+            className="bg-orange-600/90 hover:bg-orange-500 text-white font-mono font-semibold text-sm py-2.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             ⏸ PAUSE
           </button>
         </div>
         <button
           onClick={onReset}
-          className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-mono font-bold text-sm py-3 transition-all shadow-lg hover:shadow-red-500/50 rounded"
+          className="w-full bg-red-600/90 hover:bg-red-500 text-white font-mono font-semibold text-sm py-2.5 transition-all"
         >
           🔄 RESET ALL
         </button>
