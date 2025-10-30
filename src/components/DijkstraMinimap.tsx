@@ -38,9 +38,25 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
     ctx.fillStyle = 'rgba(10, 10, 30, 0.95)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Scale and offset for the graph
-    const scaleX = 20;
-    const scaleY = 20;
+    if (nodes.length === 0) return;
+
+    // Calculate bounds for proper scaling
+    const xCoords = nodes.map(n => n.x);
+    const yCoords = nodes.map(n => n.y);
+    const minX = Math.min(...xCoords);
+    const maxX = Math.max(...xCoords);
+    const minY = Math.min(...yCoords);
+    const maxY = Math.max(...yCoords);
+    
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    const maxRange = Math.max(rangeX, rangeY);
+    
+    // Scale to fit in canvas with padding
+    const padding = 30;
+    const scale = (Math.min(canvas.width, canvas.height) - padding * 2) / maxRange;
+    const centerX = minX + rangeX / 2;
+    const centerY = minY + rangeY / 2;
     const offsetX = canvas.width / 2;
     const offsetY = canvas.height / 2;
 
@@ -51,10 +67,10 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
       
       if (!fromNode || !toNode) return;
 
-      const x1 = fromNode.x * scaleX + offsetX;
-      const y1 = fromNode.y * scaleY + offsetY;
-      const x2 = toNode.x * scaleX + offsetX;
-      const y2 = toNode.y * scaleY + offsetY;
+      const x1 = (fromNode.x - centerX) * scale + offsetX;
+      const y1 = (fromNode.y - centerY) * scale + offsetY;
+      const x2 = (toNode.x - centerX) * scale + offsetX;
+      const y2 = (toNode.y - centerY) * scale + offsetY;
 
       ctx.strokeStyle = edge.isVisited ? '#00ff00' : 'rgba(255, 255, 255, 0.3)';
       ctx.lineWidth = edge.isVisited ? 2 : 1;
@@ -66,8 +82,8 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
 
     // Draw nodes
     nodes.forEach(node => {
-      const x = node.x * scaleX + offsetX;
-      const y = node.y * scaleY + offsetY;
+      const x = (node.x - centerX) * scale + offsetX;
+      const y = (node.y - centerY) * scale + offsetY;
 
       // Node circle
       ctx.beginPath();
@@ -94,17 +110,17 @@ export function DijkstraMinimap({ nodes, edges, currentNode }: DijkstraMinimapPr
 
       // Node label
       ctx.fillStyle = '#ffffff';
-      ctx.font = '8px monospace';
+      ctx.font = 'bold 9px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(node.id.substring(0, 3), x, y + 10);
+      ctx.fillText(node.id.substring(0, 4), x, y + 10);
     });
 
     // Draw character position at current node
     const currentNodeData = nodes.find(n => n.id === currentNode);
     if (currentNodeData) {
-      const x = currentNodeData.x * scaleX + offsetX;
-      const y = currentNodeData.y * scaleY + offsetY;
+      const x = (currentNodeData.x - centerX) * scale + offsetX;
+      const y = (currentNodeData.y - centerY) * scale + offsetY;
 
       // Character indicator
       ctx.fillStyle = '#ffffff';

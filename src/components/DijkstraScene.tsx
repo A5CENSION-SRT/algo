@@ -26,7 +26,7 @@ interface Edge {
 export function DijkstraScene() {
   const [lives, setLives] = useState(3);
   const [isDead, setIsDead] = useState(false);
-  const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-8, 0, 0]);
+  const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-10, 0, 2]);
   const [isAlgorithmActive, setIsAlgorithmActive] = useState(true);
   
   // Minimap data
@@ -56,7 +56,7 @@ export function DijkstraScene() {
   const handleResetAfterDeath = useCallback(() => {
     setIsDead(false);
     setLives(3);
-    setTargetPosition([-8, 0, 0]);
+    setTargetPosition([-10, 0, 2]);
     setIsAlgorithmActive(true);
   }, []);
 
@@ -85,6 +85,12 @@ export function DijkstraScene() {
     setMinimapNodes(minimapNodesData);
     setMinimapEdges(minimapEdgesData);
     setMinimapCurrentNode(currentNode);
+    
+    // Update character target position to current node
+    const currentNodeData = nodes.find(n => n.id === currentNode);
+    if (currentNodeData) {
+      setTargetPosition(currentNodeData.position);
+    }
   }, []);
 
   return (

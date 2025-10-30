@@ -15,48 +15,48 @@ export function VillageNode({ position, name, isStart, isTarget }: VillageNodePr
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Village base platform */}
-      <mesh position={[0, -0.3, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[1.5, 1.8, 0.3, 8]} />
+      {/* Village base platform - larger */}
+      <mesh position={[0, -0.4, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[2.2, 2.5, 0.4, 8]} />
         <meshStandardMaterial 
           color={isStart ? '#2d5016' : isTarget ? '#5c1616' : '#3d3d3d'}
           roughness={0.8}
         />
       </mesh>
 
-      {/* Main building */}
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <boxGeometry args={[1, 1, 1]} />
+      {/* Main building - larger */}
+      <mesh position={[0, 0.7, 0]} castShadow>
+        <boxGeometry args={[1.4, 1.4, 1.4]} />
         <meshStandardMaterial color="#8b7355" roughness={0.9} />
       </mesh>
 
-      {/* Roof */}
-      <mesh position={[0, 1.2, 0]} castShadow>
-        <coneGeometry args={[0.8, 0.6, 4]} />
+      {/* Roof - larger */}
+      <mesh position={[0, 1.6, 0]} castShadow>
+        <coneGeometry args={[1.1, 0.8, 4]} />
         <meshStandardMaterial color="#a52a2a" />
       </mesh>
 
-      {/* Windows */}
-      <mesh position={[0.51, 0.6, 0]}>
-        <planeGeometry args={[0.2, 0.2]} />
+      {/* Windows - larger */}
+      <mesh position={[0.71, 0.8, 0]}>
+        <planeGeometry args={[0.3, 0.3]} />
         <meshStandardMaterial 
           color="#ffeb3b" 
           emissive="#ffeb3b"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.6}
         />
       </mesh>
-      <mesh position={[-0.51, 0.6, 0]}>
-        <planeGeometry args={[0.2, 0.2]} />
+      <mesh position={[-0.71, 0.8, 0]}>
+        <planeGeometry args={[0.3, 0.3]} />
         <meshStandardMaterial 
           color="#ffeb3b" 
           emissive="#ffeb3b"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.6}
         />
       </mesh>
 
-      {/* Door */}
-      <mesh position={[0, 0.2, 0.51]}>
-        <planeGeometry args={[0.3, 0.5]} />
+      {/* Door - larger */}
+      <mesh position={[0, 0.3, 0.71]}>
+        <planeGeometry args={[0.4, 0.7]} />
         <meshStandardMaterial color="#654321" />
       </mesh>
 

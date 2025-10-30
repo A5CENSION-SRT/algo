@@ -23,9 +23,8 @@ export function CharacterWithMovement({
   const leftArmRef = useRef<THREE.Group>(null);
   const rightArmRef = useRef<THREE.Group>(null);
   
-  const [currentPosition, setCurrentPosition] = useState<THREE.Vector3>(new THREE.Vector3(-8, -1, 0));
   const [isMoving, setIsMoving] = useState(false);
-  const moveSpeed = 0.05;
+  const moveSpeed = 0.1; // Faster to complete movement in ~2 seconds between nodes
 
   useEffect(() => {
     if (group.current) {
@@ -33,10 +32,13 @@ export function CharacterWithMovement({
       const current = group.current.position;
       const distance = current.distanceTo(target);
       
-      if (distance > 0.1) {
+      if (distance > 0.3) { // Increased threshold for better stopping
         setIsMoving(true);
       } else {
         setIsMoving(false);
+        // Snap to exact position when close enough
+        group.current.position.copy(target);
+        group.current.position.y = targetPosition[1] - 1;
         onReachTarget();
       }
     }
@@ -89,7 +91,7 @@ export function CharacterWithMovement({
   });
 
   return (
-    <group ref={group} position={[0, -1, 0]} scale={1.2}>
+    <group ref={group} position={[-10, -1, 2]} scale={1.2}>
       {/* Head */}
       <mesh position={[0, 1.8, 0]} castShadow>
         <boxGeometry args={[0.8, 0.9, 0.8]} />

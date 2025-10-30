@@ -40,13 +40,13 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
   // Initialize graph structure with Re:Zero locations
   useEffect(() => {
     const initialNodes: Node[] = [
-      { id: 'Arlam', position: [-8, 0, 0], distance: 0, visited: false, isStart: true, isTarget: false },
-      { id: 'Earlham', position: [-4, 0, -3], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Flanders', position: [0, 0, -2], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Costuul', position: [-2, 0, -7], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Priestella', position: [4, 0, -4], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Ganaks', position: [2, 0, -8], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Lugnica', position: [8, 0, -6], distance: Infinity, visited: false, isStart: false, isTarget: true },
+      { id: 'Arlam', position: [-10, 0, 2], distance: 0, visited: false, isStart: true, isTarget: false },
+      { id: 'Earlham', position: [-5, 0, -2], distance: Infinity, visited: false, isStart: false, isTarget: false },
+      { id: 'Flanders', position: [0, 0, 0], distance: Infinity, visited: false, isStart: false, isTarget: false },
+      { id: 'Costuul', position: [-3, 0, -7], distance: Infinity, visited: false, isStart: false, isTarget: false },
+      { id: 'Priestella', position: [5, 0, -3], distance: Infinity, visited: false, isStart: false, isTarget: false },
+      { id: 'Ganaks', position: [2, 0, -9], distance: Infinity, visited: false, isStart: false, isTarget: false },
+      { id: 'Lugnica', position: [10, 0, -5], distance: Infinity, visited: false, isStart: false, isTarget: true },
     ];
 
     const initialEdges: Edge[] = [
@@ -155,36 +155,56 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
             isTarget={node.isTarget}
           />
           
+          {/* Village name label above */}
+          <Text
+            position={[0, 3, 0]}
+            fontSize={0.5}
+            color={node.isStart ? '#00ff00' : node.isTarget ? '#ff0000' : '#ffffff'}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.03}
+            outlineColor="#000000"
+          >
+            {node.id.toUpperCase()}
+          </Text>
+          
           {/* Glow effect for current node */}
           {currentNode === node.id && (
-            <pointLight
-              position={[0, 2, 0]}
-              color="#00ffff"
-              intensity={2}
-              distance={5}
-            />
+            <>
+              <pointLight
+                position={[0, 2, 0]}
+                color="#00ffff"
+                intensity={3}
+                distance={6}
+              />
+              {/* Pulsing ring */}
+              <mesh position={[0, -0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[2.5, 3, 32]} />
+                <meshBasicMaterial color="#00ffff" transparent opacity={0.5} />
+              </mesh>
+            </>
           )}
 
           {/* Distance indicator */}
           {node.distance !== Infinity && (
             <Text
-              position={[0, -1.2, 0]}
-              fontSize={0.3}
+              position={[0, -1.5, 0]}
+              fontSize={0.4}
               color="#ffff00"
               anchorX="center"
               anchorY="middle"
-              outlineWidth={0.02}
+              outlineWidth={0.03}
               outlineColor="#000000"
             >
-              {node.distance} km
+              Distance: {node.distance} km
             </Text>
           )}
 
           {/* Visited checkmark */}
           {node.visited && (
             <Text
-              position={[0, 2.5, 0]}
-              fontSize={0.4}
+              position={[0, 3.8, 0]}
+              fontSize={0.6}
               color="#00ff00"
               anchorX="center"
               anchorY="middle"
@@ -220,7 +240,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
         <PathPreview
           currentNode={currentNode}
           availablePaths={getAvailablePaths()}
-          position={[0, 3, -8]}
+          position={[0, 4.5, -10]}
         />
       )}
     </group>
@@ -253,23 +273,47 @@ function EdgeLine({
 
   return (
     <group>
-      <primitive object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ 
-        color: isVisited ? '#00ff00' : '#ffffff',
-        linewidth: isVisited ? 3 : 1,
-        opacity: isVisited ? 1 : 0.3,
-        transparent: true
-      }))} />
+      {/* Use a tube geometry for thicker, more visible edges */}
+      <mesh>
+        <tubeGeometry args={[
+          new THREE.CatmullRomCurve3(points),
+          20,
+          isVisited ? 0.08 : 0.04,
+          8,
+          false
+        ]} />
+        <meshStandardMaterial 
+          color={isVisited ? '#00ff00' : '#aaaaaa'}
+          emissive={isVisited ? '#00ff00' : '#000000'}
+          emissiveIntensity={isVisited ? 0.5 : 0}
+          transparent
+          opacity={isVisited ? 0.9 : 0.4}
+        />
+      </mesh>
       
-      {/* Weight Label */}
-      <Text
-        position={[midpoint.x, midpoint.y + 0.3, midpoint.z]}
-        fontSize={0.25}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {weight}
-      </Text>
+      {/* Weight Label with background */}
+      <group position={[midpoint.x, midpoint.y + 0.5, midpoint.z]}>
+        {/* Label background */}
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[0.8, 0.4]} />
+          <meshBasicMaterial 
+            color="#000000" 
+            transparent 
+            opacity={0.7}
+          />
+        </mesh>
+        <Text
+          position={[0, 0, 0]}
+          fontSize={0.3}
+          color="#ffff00"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000000"
+        >
+          {weight} km
+        </Text>
+      </group>
     </group>
   );
 }
