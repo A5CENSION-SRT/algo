@@ -4,7 +4,7 @@ import { Scene3D } from '@/components/Scene3D';
 import { Minimap } from '@/components/Minimap';
 import { useState, useEffect } from 'react';
 
-export default function Home() {
+export default function ExperiencePage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
