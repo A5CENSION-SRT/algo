@@ -11,10 +11,12 @@ import SplitText from '@/components/SplitText';
 export default function Home() {
   const router = useRouter();
   const [transitions] = useState([
-    { source: 'Start', target: 'Explore' },
-    { source: 'Explore', target: 'Learn' },
-    { source: 'Learn', target: 'Master' },
-    { source: 'Start', target: 'Master' },
+    { source: 'Mansion', target: 'Village' },
+    { source: 'Village', target: 'Forest' },
+    { source: 'Forest', target: 'Capital' },
+    { source: 'Capital', target: 'Sanctuary' },
+    { source: 'Village', target: 'LootHouse' },
+    { source: 'LootHouse', target: 'WitchCult' },
   ]);
 
   return (
@@ -40,15 +42,15 @@ export default function Home() {
         <header className="p-6">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div
-              className="bg-black/40 backdrop-blur-md border-2 border-cyan-400 px-6 py-3"
+              className="bg-black/40 backdrop-blur-md border-2 border-red-400 px-6 py-3"
               style={{
                 clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)',
               }}
             >
-              <h1 className="text-2xl font-mono font-bold text-cyan-300 tracking-wider">
+              <h1 className="text-2xl font-mono font-bold text-red-300 tracking-wider">
                 <SplitText
-                  text="ALGOVIBE"
-                  className="text-2xl font-mono font-bold text-cyan-300 tracking-wider"
+                  text="RE:ZERO PATHFINDER"
+                  className="text-2xl font-mono font-bold text-red-300 tracking-wider"
                   delay={0.5}
                   duration={1}
                   ease="power2.out"
@@ -62,21 +64,21 @@ export default function Home() {
             <nav className="flex gap-4">
               <a
                 href="/experience"
+                className="bg-black/40 backdrop-blur-md border-2 border-red-400 px-5 py-2 font-mono text-red-300 hover:bg-red-500/20 transition-colors"
+                style={{
+                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
+                }}
+              >
+                🔄 Return by Death
+              </a>
+              <a
+                href="#about"
                 className="bg-black/40 backdrop-blur-md border-2 border-purple-400 px-5 py-2 font-mono text-purple-300 hover:bg-purple-500/20 transition-colors"
                 style={{
                   clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
                 }}
               >
-                Experience
-              </a>
-              <a
-                href="#learn"
-                className="bg-black/40 backdrop-blur-md border-2 border-pink-400 px-5 py-2 font-mono text-pink-300 hover:bg-pink-500/20 transition-colors"
-                style={{
-                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
-                }}
-              >
-                Learn
+                About
               </a>
             </nav>
           </div>
@@ -88,15 +90,15 @@ export default function Home() {
             {/* Left side - Hero content */}
             <div className="space-y-6">
               <div
-                className="bg-black/40 backdrop-blur-md border-2 border-cyan-400 p-8"
+                className="bg-black/40 backdrop-blur-md border-2 border-red-400 p-8"
                 style={{
                   clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))',
                 }}
               >
                 <h2 className="text-5xl md:text-6xl font-mono font-bold text-white mb-4 leading-tight">
                   <SplitText
-                    text="Visualize"
-                    className="text-5xl md:text-6xl font-mono font-bold text-white leading-tight"
+                    text="Return"
+                    className="text-5xl md:text-6xl font-mono font-bold text-red-300 leading-tight"
                     delay={1}
                     duration={1.2}
                     ease="power2.out"
@@ -105,10 +107,11 @@ export default function Home() {
                     to={{ opacity: 1, x: 0 }}
                   />
                   <br />
+                  <span className="text-white">by </span>
                   <span>
                     <SplitText
-                      text="Algorithms"
-                      className="text-5xl md:text-6xl font-mono font-bold leading-tight"
+                      text="Death"
+                      className="text-5xl md:text-6xl font-mono font-bold text-red-400 leading-tight"
                       delay={1.5}
                       duration={1.2}
                       ease="power2.out"
@@ -119,7 +122,7 @@ export default function Home() {
                   </span>
                 </h2>
                 <BlurText
-                  text="Transform complex DSA problems into stunning 3D interactive experiences. Learn by seeing, explore by doing."
+                  text="Experience Subaru's cursed ability through Dijkstra's Algorithm. Navigate branching timelines, find optimal paths, and witness dramatic deaths as shorter routes emerge."
                   className="text-lg text-gray-300 font-mono leading-relaxed"
                   delay={2}
                   animateBy="words"
@@ -133,47 +136,57 @@ export default function Home() {
               <div className="flex gap-4">
                 <button
                   onClick={() => router.push('/experience')}
-                  className="group relative px-8 py-4 text-lg font-bold font-mono tracking-wider bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transition-all duration-300 transform hover:scale-105 border-2 border-white/50 shadow-lg active:scale-95"
+                  className="group relative px-8 py-4 text-lg font-bold font-mono tracking-wider bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white transition-all duration-300 transform hover:scale-105 border-2 border-white/50 shadow-lg active:scale-95"
                   style={{
                     clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  Get Started
+                  🔄 Start Journey
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity" />
                 </button>
 
                 <button
                   onClick={() => router.push('/experience')}
-                  className="px-8 py-4 text-lg font-mono bg-black/40 backdrop-blur-md border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 transition-all duration-300"
+                  className="px-8 py-4 text-lg font-mono bg-black/40 backdrop-blur-md border-2 border-purple-400 text-purple-300 hover:bg-purple-500/20 transition-all duration-300"
                   style={{
                     clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  Explore
+                  Watch Demo
                 </button>
               </div>
 
               {/* Feature badges */}
               <div className="flex gap-3 flex-wrap">
-                <div className="px-4 py-2 bg-black/40 backdrop-blur-md border border-cyan-400/50 font-mono text-xs text-cyan-300">
-                  [3D VISUALIZATION]
+                <div className="px-4 py-2 bg-black/40 backdrop-blur-md border border-red-400/50 font-mono text-xs text-red-300">
+                  [DIJKSTRA'S ALGORITHM]
                 </div>
                 <div className="px-4 py-2 bg-black/40 backdrop-blur-md border border-purple-400/50 font-mono text-xs text-purple-300">
-                  [INTERACTIVE]
+                  [MULTIPLE TIMELINES]
                 </div>
                 <div className="px-4 py-2 bg-black/40 backdrop-blur-md border border-pink-400/50 font-mono text-xs text-pink-300">
-                  [REAL-TIME]
+                  [VOXEL 3D]
                 </div>
               </div>
             </div>
 
             {/* Right side - MiniMapView showcase */}
             <div className="space-y-4">
-              <MiniMapView
-                transitions={transitions}
-                startNode="Start"
-                goalNode="Master"
-              />
+              <div
+                className="bg-black/60 backdrop-blur-md border-2 border-purple-400 p-3"
+                style={{
+                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
+                }}
+              >
+                <p className="font-mono text-purple-300 text-xs mb-2 text-center">
+                  TIMELINE GRAPH
+                </p>
+                <MiniMapView
+                  transitions={transitions}
+                  startNode="Mansion"
+                  goalNode="WitchCult"
+                />
+              </div>
 
               <div
                 className="bg-black/40 backdrop-blur-md border-2 border-yellow-400 p-4"
@@ -182,29 +195,29 @@ export default function Home() {
                 }}
               >
                 <p className="font-mono text-yellow-300 text-sm">
-                  <span className="text-yellow-400">▶</span> Graph visualization updates in real-time as you define nodes and edges.
+                  <span className="text-red-400">💀</span> Each edge represents deaths required. 
+                  Characters spawn, explore paths, and die dramatically when shorter routes are discovered.
                 </p>
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-3">
                 <div
-                  className="bg-black/40 backdrop-blur-md border border-cyan-400 p-3 text-center"
+                  className="bg-black/40 backdrop-blur-md border border-red-400 p-3 text-center"
                   style={{
                     clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  <div className="text-2xl font-mono font-bold text-cyan-400">
+                  <div className="text-2xl font-mono font-bold text-red-400">
                     <CountUp
-                      to={50}
+                      to={7}
                       duration={2}
                       delay={2.5}
                       separator=""
-                      className="text-2xl font-mono font-bold text-cyan-400"
+                      className="text-2xl font-mono font-bold text-red-400"
                     />
-                    +
                   </div>
-                  <div className="text-xs font-mono text-cyan-300/70">Algorithms</div>
+                  <div className="text-xs font-mono text-red-300/70">Villages</div>
                 </div>
                 <div
                   className="bg-black/40 backdrop-blur-md border border-purple-400 p-3 text-center"
@@ -214,7 +227,7 @@ export default function Home() {
                 >
                   <div className="text-2xl font-mono font-bold text-purple-400">
                     <SplitText
-                      text="3D"
+                      text="∞"
                       className="text-2xl font-mono font-bold text-purple-400"
                       delay={3}
                       duration={1}
@@ -224,18 +237,18 @@ export default function Home() {
                       to={{ opacity: 1, scale: 1 }}
                     />
                   </div>
-                  <div className="text-xs font-mono text-purple-300/70">Visualizations</div>
+                  <div className="text-xs font-mono text-purple-300/70">Deaths</div>
                 </div>
                 <div
-                  className="bg-black/40 backdrop-blur-md border border-pink-400 p-3 text-center"
+                  className="bg-black/40 backdrop-blur-md border border-green-400 p-3 text-center"
                   style={{
                     clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)',
                   }}
                 >
-                  <div className="text-2xl font-mono font-bold text-pink-400">
+                  <div className="text-2xl font-mono font-bold text-green-400">
                     <SplitText
-                      text="∞"
-                      className="text-2xl font-mono font-bold text-pink-400"
+                      text="1"
+                      className="text-2xl font-mono font-bold text-green-400"
                       delay={3.5}
                       duration={1}
                       ease="power2.out"
@@ -244,7 +257,7 @@ export default function Home() {
                       to={{ opacity: 1, rotate: 0 }}
                     />
                   </div>
-                  <div className="text-xs font-mono text-pink-300/70">Possibilities</div>
+                  <div className="text-xs font-mono text-green-300/70">Optimal Path</div>
                 </div>
               </div>
             </div>
@@ -252,9 +265,9 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Ambient glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none" />
+      {/* Ambient glow effects - Re:Zero red/purple theme */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Background music */}
       <audio
