@@ -39,7 +39,7 @@ export function DijkstraBuilderMenu({
   isRunning
 }: DijkstraBuilderMenuProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<'nodes' | 'edges'>('nodes');
+  const [activeTab, setActiveTab] = useState<'nodes' | 'edges' | 'control'>('nodes');
   
   // Node form state
   const [nodeName, setNodeName] = useState('');
@@ -122,6 +122,10 @@ export function DijkstraBuilderMenu({
     onEdgesChange(edges.filter(e => !(e.from === from && e.to === to)));
   };
 
+  const hasStartNode = nodes.some(n => n.isStart);
+  const hasTargetNode = nodes.some(n => n.isTarget);
+  const canRunAlgorithm = nodes.length > 0 && hasStartNode && hasTargetNode && edges.length > 0;
+
   if (!isOpen) {
     return (
       <button
@@ -135,102 +139,100 @@ export function DijkstraBuilderMenu({
   }
 
   return (
-    <div className="absolute left-6 top-6 bottom-6 z-20 w-96 bg-black/80 backdrop-blur-md border-2 border-cyan-400 overflow-hidden flex flex-col"
+    <div className="absolute left-6 top-6 bottom-6 z-20 w-96 bg-[#0a1929]/95 backdrop-blur-lg border-2 border-cyan-400 overflow-hidden flex flex-col shadow-2xl"
          style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%)' }}>
       
       {/* Header */}
-      <div className="bg-cyan-900/50 border-b-2 border-cyan-400 px-4 py-3 flex justify-between items-center">
-        <h2 className="text-xl font-mono font-bold text-cyan-300">
+      <div className="bg-gradient-to-r from-cyan-900/40 to-teal-900/40 border-b border-cyan-400/50 px-5 py-4 flex justify-between items-center">
+        <h2 className="text-xl font-sans font-bold text-cyan-300 tracking-wider">
           DIJKSTRA BUILDER
         </h2>
         <button
           onClick={() => setIsOpen(false)}
-          className="text-cyan-300 hover:text-white font-mono text-lg"
+          className="text-cyan-300 hover:text-white transition-colors text-2xl leading-none"
+          aria-label="Close"
         >
           ✕
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b-2 border-cyan-400/50">
+      <div className="flex border-b border-cyan-400/30 bg-black/20">
         <button
           onClick={() => setActiveTab('nodes')}
-          className={`flex-1 py-2 px-4 font-mono text-sm transition-colors ${
+          className={`flex-1 py-3 px-4 font-mono text-sm transition-all ${
             activeTab === 'nodes'
-              ? 'bg-cyan-500/30 text-cyan-300 border-b-2 border-cyan-300'
-              : 'text-gray-400 hover:text-cyan-300'
+              ? 'bg-cyan-500/20 text-cyan-300 border-b-2 border-cyan-400'
+              : 'text-gray-500 hover:text-cyan-300 hover:bg-cyan-900/10'
           }`}
         >
           VILLAGES ({nodes.length})
         </button>
         <button
           onClick={() => setActiveTab('edges')}
-          className={`flex-1 py-2 px-4 font-mono text-sm transition-colors ${
+          className={`flex-1 py-3 px-4 font-mono text-sm transition-all ${
             activeTab === 'edges'
-              ? 'bg-cyan-500/30 text-cyan-300 border-b-2 border-cyan-300'
-              : 'text-gray-400 hover:text-cyan-300'
+              ? 'bg-cyan-500/20 text-cyan-300 border-b-2 border-cyan-400'
+              : 'text-gray-500 hover:text-cyan-300 hover:bg-cyan-900/10'
           }`}
         >
           ROADS ({edges.length})
         </button>
       </div>
 
-      {/* Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Content Area - Hidden Scrollbar */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
         {activeTab === 'nodes' ? (
           <>
             {/* Add Node Form */}
-            <div className="bg-cyan-900/20 border border-cyan-400/50 p-3 space-y-3">
-              <h3 className="text-cyan-300 font-mono text-sm font-bold">ADD NEW VILLAGE</h3>
+            <div className="bg-black/30 border border-cyan-400/30 p-4 space-y-3">
               
               <div>
-                <label className="text-xs text-gray-400 font-mono">Village Name</label>
                 <input
                   type="text"
                   value={nodeName}
                   onChange={(e) => setNodeName(e.target.value)}
-                  className="w-full bg-black/50 border border-cyan-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-cyan-400"
-                  placeholder="e.g., Arlam"
+                  className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                  placeholder="Village name..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddNode()}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-gray-400 font-mono">Position X</label>
-                  <input
-                    type="number"
-                    value={nodeX}
-                    onChange={(e) => setNodeX(e.target.value)}
-                    className="w-full bg-black/50 border border-cyan-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-400 font-mono">Position Z</label>
-                  <input
-                    type="number"
-                    value={nodeZ}
-                    onChange={(e) => setNodeZ(e.target.value)}
-                    className="w-full bg-black/50 border border-cyan-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="number"
+                  value={nodeX}
+                  onChange={(e) => setNodeX(e.target.value)}
+                  className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                  placeholder="X"
+                />
+                <input
+                  type="number"
+                  value={nodeZ}
+                  onChange={(e) => setNodeZ(e.target.value)}
+                  className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                  placeholder="Z"
+                />
               </div>
 
-              <div className="space-y-1">
-                <label className="flex items-center space-x-2 text-sm text-white font-mono cursor-pointer">
+              <div className="flex gap-2">
+                <label className="flex items-center space-x-2 text-xs text-gray-400 font-mono cursor-pointer hover:text-cyan-300 transition-colors">
                   <input
                     type="checkbox"
                     checked={nodeIsStart}
                     onChange={(e) => setNodeIsStart(e.target.checked)}
-                    className="w-4 h-4"
+                    disabled={hasStartNode && !nodeIsStart}
+                    className="w-3.5 h-3.5"
                   />
                   <span>🏁 Set as Start Village</span>
                 </label>
-                <label className="flex items-center space-x-2 text-sm text-white font-mono cursor-pointer">
+                <label className="flex items-center space-x-2 text-xs text-gray-400 font-mono cursor-pointer hover:text-cyan-300 transition-colors">
                   <input
                     type="checkbox"
                     checked={nodeIsTarget}
                     onChange={(e) => setNodeIsTarget(e.target.checked)}
-                    className="w-4 h-4"
+                    disabled={hasTargetNode && !nodeIsTarget}
+                    className="w-3.5 h-3.5"
                   />
                   <span>🎯 Set as Target Village</span>
                 </label>
@@ -238,7 +240,8 @@ export function DijkstraBuilderMenu({
 
               <button
                 onClick={handleAddNode}
-                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-sm py-2 transition-all"
+                disabled={!nodeName.trim()}
+                className="w-full bg-cyan-600/80 hover:bg-cyan-500 text-white font-mono text-sm py-2.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 + ADD VILLAGE
               </button>
@@ -246,28 +249,29 @@ export function DijkstraBuilderMenu({
 
             {/* Node List */}
             <div className="space-y-2">
-              <h3 className="text-cyan-300 font-mono text-sm font-bold">EXISTING VILLAGES</h3>
+              <h3 className="text-cyan-300/80 font-mono text-xs font-bold uppercase tracking-wider">EXISTING VILLAGES</h3>
               {nodes.length === 0 ? (
-                <p className="text-gray-500 font-mono text-xs">No villages added yet</p>
+                <p className="text-gray-600 font-mono text-xs text-center py-4">No villages added yet</p>
               ) : (
                 nodes.map((node) => (
                   <div
                     key={node.id}
-                    className="bg-black/50 border border-cyan-400/50 p-2 flex justify-between items-start"
+                    className="bg-black/40 border border-cyan-400/30 p-3 flex justify-between items-center hover:border-cyan-400/50 transition-colors"
                   >
                     <div className="flex-1">
-                      <div className="text-white font-mono text-sm font-bold">
+                      <div className="text-white font-mono text-sm font-medium flex items-center gap-2">
                         {node.id}
-                        {node.isStart && <span className="ml-2 text-green-400">🏁</span>}
-                        {node.isTarget && <span className="ml-2 text-red-400">🎯</span>}
+                        {node.isStart && <span className="text-xs">🏁</span>}
+                        {node.isTarget && <span className="text-xs">🎯</span>}
                       </div>
-                      <div className="text-gray-400 font-mono text-xs">
+                      <div className="text-gray-500 font-mono text-xs mt-0.5">
                         Position: ({node.position[0].toFixed(1)}, {node.position[2].toFixed(1)})
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveNode(node.id)}
-                      className="text-red-400 hover:text-red-300 text-sm ml-2"
+                      className="text-red-500/70 hover:text-red-400 text-lg ml-2 transition-colors"
+                      aria-label="Delete"
                     >
                       ✕
                     </button>
@@ -279,52 +283,46 @@ export function DijkstraBuilderMenu({
         ) : (
           <>
             {/* Add Edge Form */}
-            <div className="bg-purple-900/20 border border-purple-400/50 p-3 space-y-3">
-              <h3 className="text-purple-300 font-mono text-sm font-bold">ADD NEW ROAD</h3>
+            <div className="bg-black/30 border border-cyan-400/30 p-4 space-y-3">
               
-              <div>
-                <label className="text-xs text-gray-400 font-mono">From Village</label>
-                <select
-                  value={edgeFrom}
-                  onChange={(e) => setEdgeFrom(e.target.value)}
-                  className="w-full bg-black/50 border border-purple-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-purple-400"
-                >
-                  <option value="">Select...</option>
-                  {nodes.map((node) => (
-                    <option key={node.id} value={node.id}>{node.id}</option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={edgeFrom}
+                onChange={(e) => setEdgeFrom(e.target.value)}
+                disabled={nodes.length < 2}
+                className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
+              >
+                <option value="">From...</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>{node.id}</option>
+                ))}
+              </select>
 
-              <div>
-                <label className="text-xs text-gray-400 font-mono">To Village</label>
-                <select
-                  value={edgeTo}
-                  onChange={(e) => setEdgeTo(e.target.value)}
-                  className="w-full bg-black/50 border border-purple-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-purple-400"
-                >
-                  <option value="">Select...</option>
-                  {nodes.map((node) => (
-                    <option key={node.id} value={node.id}>{node.id}</option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={edgeTo}
+                onChange={(e) => setEdgeTo(e.target.value)}
+                disabled={nodes.length < 2}
+                className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
+              >
+                <option value="">To...</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>{node.id}</option>
+                ))}
+              </select>
 
-              <div>
-                <label className="text-xs text-gray-400 font-mono">Distance (km)</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={edgeWeight}
-                  onChange={(e) => setEdgeWeight(e.target.value)}
-                  className="w-full bg-black/50 border border-purple-400/50 px-2 py-1 text-white font-mono text-sm focus:outline-none focus:border-purple-400"
-                />
-              </div>
+              <input
+                type="number"
+                min="1"
+                value={edgeWeight}
+                onChange={(e) => setEdgeWeight(e.target.value)}
+                disabled={nodes.length < 2}
+                className="w-full bg-black/60 border border-cyan-400/40 px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
+                placeholder="Distance (km)..."
+              />
 
               <button
                 onClick={handleAddEdge}
-                disabled={nodes.length < 2}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-mono text-sm py-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={nodes.length < 2 || !edgeFrom || !edgeTo}
+                className="w-full bg-cyan-600/80 hover:bg-cyan-500 text-white font-mono text-sm py-2.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 + ADD ROAD
               </button>
@@ -364,26 +362,37 @@ export function DijkstraBuilderMenu({
       </div>
 
       {/* Footer with Action Buttons */}
-      <div className="border-t-2 border-cyan-400 p-4 space-y-2 bg-black/50">
-        <div className="grid grid-cols-2 gap-2">
+      <div className="border-t-2 border-cyan-400 p-4 space-y-3 bg-gradient-to-b from-black/50 to-black/80">
+        {/* Status Indicator */}
+        {!canRunAlgorithm && (
+          <div className="bg-yellow-900/30 border border-yellow-600 px-3 py-2 rounded text-xs font-mono text-yellow-200">
+            <p className="font-bold">⚠️ Requirements:</p>
+            {!hasStartNode && <p className="text-xs">• Add a Start node 🏁</p>}
+            {!hasTargetNode && <p className="text-xs">• Add a Target node 🎯</p>}
+            {edges.length === 0 && <p className="text-xs">• Add at least one edge</p>}
+          </div>
+        )}
+        
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onRunAlgorithm}
-            disabled={isRunning || nodes.length === 0}
-            className="bg-green-600 hover:bg-green-500 text-white font-mono text-sm py-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isRunning || !canRunAlgorithm}
+            title={!canRunAlgorithm ? 'Complete setup requirements first' : 'Start algorithm'}
+            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-mono font-bold text-sm py-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-green-500/50 rounded"
           >
             ▶ RUN
           </button>
           <button
             onClick={onPauseAlgorithm}
             disabled={!isRunning}
-            className="bg-yellow-600 hover:bg-yellow-500 text-white font-mono text-sm py-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-yellow-600 to-orange-500 hover:from-yellow-500 hover:to-orange-400 text-white font-mono font-bold text-sm py-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg rounded"
           >
             ⏸ PAUSE
           </button>
         </div>
         <button
           onClick={onReset}
-          className="w-full bg-red-600 hover:bg-red-500 text-white font-mono text-sm py-2 transition-all"
+          className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-mono font-bold text-sm py-3 transition-all shadow-lg hover:shadow-red-500/50 rounded"
         >
           🔄 RESET ALL
         </button>

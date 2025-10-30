@@ -2,7 +2,7 @@
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
-import { Suspense, useState, useCallback } from 'react';
+import { Suspense, useState, useCallback, useEffect } from 'react';
 import { DijkstraVisualization } from './DijkstraVisualization';
 import { CharacterWithMovement } from './CharacterWithMovement';
 import { AudioManager } from './AudioManager';
@@ -34,6 +34,11 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
   const [isDead, setIsDead] = useState(false);
   const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-10, 0, 2]);
   const [isAlgorithmActive, setIsAlgorithmActive] = useState(isRunning);
+  
+  // Sync with external isRunning prop
+  useEffect(() => {
+    setIsAlgorithmActive(isRunning);
+  }, [isRunning]);
   
   // Minimap data
   const [minimapNodes, setMinimapNodes] = useState<any[]>([]);

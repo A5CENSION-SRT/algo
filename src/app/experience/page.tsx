@@ -50,13 +50,54 @@ export default function ExperiencePage() {
     }, []);
 
     const handleReset = () => {
-        setNodes([]);
-        setEdges([]);
+        // Reset to empty or keep default data
+        const resetToDefault = confirm('Reset to default graph? Click Cancel to clear everything.');
+        if (resetToDefault) {
+            setNodes([
+                { id: 'Arlam', position: [-10, 0, 2], distance: 0, visited: false, isStart: true, isTarget: false },
+                { id: 'Earlham', position: [-5, 0, -2], distance: Infinity, visited: false, isStart: false, isTarget: false },
+                { id: 'Flanders', position: [0, 0, 0], distance: Infinity, visited: false, isStart: false, isTarget: false },
+                { id: 'Costuul', position: [-3, 0, -7], distance: Infinity, visited: false, isStart: false, isTarget: false },
+                { id: 'Priestella', position: [5, 0, -3], distance: Infinity, visited: false, isStart: false, isTarget: false },
+                { id: 'Ganaks', position: [2, 0, -9], distance: Infinity, visited: false, isStart: false, isTarget: false },
+                { id: 'Lugnica', position: [10, 0, -5], distance: Infinity, visited: false, isStart: false, isTarget: true },
+            ]);
+            setEdges([
+                { from: 'Arlam', to: 'Earlham', weight: 4 },
+                { from: 'Arlam', to: 'Costuul', weight: 8 },
+                { from: 'Earlham', to: 'Flanders', weight: 3 },
+                { from: 'Earlham', to: 'Costuul', weight: 5 },
+                { from: 'Flanders', to: 'Priestella', weight: 2 },
+                { from: 'Flanders', to: 'Ganaks', weight: 6 },
+                { from: 'Costuul', to: 'Ganaks', weight: 2 },
+                { from: 'Priestella', to: 'Lugnica', weight: 3 },
+                { from: 'Ganaks', to: 'Lugnica', weight: 7 },
+            ]);
+        } else {
+            setNodes([]);
+            setEdges([]);
+        }
         setIsAlgorithmRunning(false);
         setAlgorithmKey(prev => prev + 1);
     };
 
     const handleRunAlgorithm = () => {
+        if (nodes.length === 0) {
+            alert('Please add nodes first!');
+            return;
+        }
+        if (!nodes.some(n => n.isStart)) {
+            alert('Please mark a start node!');
+            return;
+        }
+        if (!nodes.some(n => n.isTarget)) {
+            alert('Please mark a target node!');
+            return;
+        }
+        if (edges.length === 0) {
+            alert('Please add edges to connect nodes!');
+            return;
+        }
         setIsAlgorithmRunning(true);
         setAlgorithmKey(prev => prev + 1);
     };
