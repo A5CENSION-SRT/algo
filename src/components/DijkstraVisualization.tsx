@@ -28,9 +28,11 @@ interface DijkstraVisualizationProps {
   onReachTarget: () => void;
   isActive: boolean;
   onNodesUpdate?: (nodes: Node[], currentNode: string, edges: Edge[], visitedNodes: Set<string>) => void;
+  initialNodes?: Node[];
+  initialEdges?: Edge[];
 }
 
-export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onNodesUpdate }: DijkstraVisualizationProps) {
+export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onNodesUpdate, initialNodes = [], initialEdges = [] }: DijkstraVisualizationProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -39,33 +41,24 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
   const [visitedNodes, setVisitedNodes] = useState<Set<string>>(new Set());
   const [shortestPath, setShortestPath] = useState<string[]>([]); // Current shortest path
 
-  // Initialize graph structure with Re:Zero locations
+  // Initialize graph structure
   useEffect(() => {
-    const initialNodes: Node[] = [
-      { id: 'Arlam', position: [-10, 0, 2], distance: 0, visited: false, isStart: true, isTarget: false },
-      { id: 'Earlham', position: [-5, 0, -2], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Flanders', position: [0, 0, 0], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Costuul', position: [-3, 0, -7], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Priestella', position: [5, 0, -3], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Ganaks', position: [2, 0, -9], distance: Infinity, visited: false, isStart: false, isTarget: false },
-      { id: 'Lugnica', position: [10, 0, -5], distance: Infinity, visited: false, isStart: false, isTarget: true },
-    ];
-
-    const initialEdges: Edge[] = [
-      { from: 'Arlam', to: 'Earlham', weight: 4 },
-      { from: 'Arlam', to: 'Costuul', weight: 8 },
-      { from: 'Earlham', to: 'Flanders', weight: 3 },
-      { from: 'Earlham', to: 'Costuul', weight: 5 },
-      { from: 'Flanders', to: 'Priestella', weight: 2 },
-      { from: 'Flanders', to: 'Ganaks', weight: 6 },
-      { from: 'Costuul', to: 'Ganaks', weight: 2 },
-      { from: 'Priestella', to: 'Lugnica', weight: 3 },
-      { from: 'Ganaks', to: 'Lugnica', weight: 7 },
-    ];
-
-    setNodes(initialNodes);
-    setEdges(initialEdges);
-  }, []);
+    if (initialNodes.length > 0) {
+      setNodes(initialNodes);
+      setEdges(initialEdges);
+      
+      // Find start node for currentNode
+      const startNode = initialNodes.find(n => n.isStart);
+      if (startNode) {
+        setCurrentNode(startNode.id);
+      }
+      
+      // Reset algorithm state
+      setVisitedNodes(new Set());
+      setShortestPath([]);
+      setAlgorithmStep(0);
+    }
+  }, [initialNodes, initialEdges]);
 
   // Run Dijkstra's algorithm step by step
   useEffect(() => {
