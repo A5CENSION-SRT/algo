@@ -23,11 +23,17 @@ interface Edge {
   weight: number;
 }
 
-export function DijkstraScene() {
+interface DijkstraSceneProps {
+  initialNodes?: Node[];
+  initialEdges?: Edge[];
+  isRunning?: boolean;
+}
+
+export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning = false }: DijkstraSceneProps) {
   const [lives, setLives] = useState(3);
   const [isDead, setIsDead] = useState(false);
   const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-10, 0, 2]);
-  const [isAlgorithmActive, setIsAlgorithmActive] = useState(true);
+  const [isAlgorithmActive, setIsAlgorithmActive] = useState(isRunning);
   
   // Minimap data
   const [minimapNodes, setMinimapNodes] = useState<any[]>([]);
@@ -147,6 +153,8 @@ export function DijkstraScene() {
             onReachTarget={handleReachTarget}
             isActive={isAlgorithmActive}
             onNodesUpdate={handleNodesUpdate}
+            initialNodes={initialNodes}
+            initialEdges={initialEdges}
           />
           
           {/* Character that moves between nodes */}

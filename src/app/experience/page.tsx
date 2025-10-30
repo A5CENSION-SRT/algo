@@ -1,19 +1,69 @@
 'use client';
 
-import { MainScene } from '@/components/MainScene';
 import { DijkstraScene } from '@/components/DijkstraScene';
-import { MinimapOverlay } from '@/components/MinimapOverlay';
 import { HUDOverlay } from '@/components/HUDOverlay';
-import { BottomUIOverlay } from '@/components/BottomUIOverlay';
+import { DijkstraBuilderMenu } from '@/components/DijkstraBuilderMenu';
 import { useState, useEffect } from 'react';
+
+interface Node {
+  id: string;
+  position: [number, number, number];
+  distance: number;
+  visited: boolean;
+  isTarget: boolean;
+  isStart: boolean;
+}
+
+interface Edge {
+  from: string;
+  to: string;
+  weight: number;
+}
 
 export default function ExperiencePage() {
     const [isClient, setIsClient] = useState(false);
-    const [mode, setMode] = useState<'infinite' | 'dijkstra'>('dijkstra');
+    const [nodes, setNodes] = useState<Node[]>([
+        { id: 'Arlam', position: [-10, 0, 2], distance: 0, visited: false, isStart: true, isTarget: false },
+        { id: 'Earlham', position: [-5, 0, -2], distance: Infinity, visited: false, isStart: false, isTarget: false },
+        { id: 'Flanders', position: [0, 0, 0], distance: Infinity, visited: false, isStart: false, isTarget: false },
+        { id: 'Costuul', position: [-3, 0, -7], distance: Infinity, visited: false, isStart: false, isTarget: false },
+        { id: 'Priestella', position: [5, 0, -3], distance: Infinity, visited: false, isStart: false, isTarget: false },
+        { id: 'Ganaks', position: [2, 0, -9], distance: Infinity, visited: false, isStart: false, isTarget: false },
+        { id: 'Lugnica', position: [10, 0, -5], distance: Infinity, visited: false, isStart: false, isTarget: true },
+    ]);
+    const [edges, setEdges] = useState<Edge[]>([
+        { from: 'Arlam', to: 'Earlham', weight: 4 },
+        { from: 'Arlam', to: 'Costuul', weight: 8 },
+        { from: 'Earlham', to: 'Flanders', weight: 3 },
+        { from: 'Earlham', to: 'Costuul', weight: 5 },
+        { from: 'Flanders', to: 'Priestella', weight: 2 },
+        { from: 'Flanders', to: 'Ganaks', weight: 6 },
+        { from: 'Costuul', to: 'Ganaks', weight: 2 },
+        { from: 'Priestella', to: 'Lugnica', weight: 3 },
+        { from: 'Ganaks', to: 'Lugnica', weight: 7 },
+    ]);
+    const [isAlgorithmRunning, setIsAlgorithmRunning] = useState(false);
+    const [algorithmKey, setAlgorithmKey] = useState(0);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    const handleReset = () => {
+        setNodes([]);
+        setEdges([]);
+        setIsAlgorithmRunning(false);
+        setAlgorithmKey(prev => prev + 1);
+    };
+
+    const handleRunAlgorithm = () => {
+        setIsAlgorithmRunning(true);
+        setAlgorithmKey(prev => prev + 1);
+    };
+
+    const handlePauseAlgorithm = () => {
+        setIsAlgorithmRunning(false);
+    };
 
     if (!isClient) {
         return null;
@@ -48,42 +98,36 @@ export default function ExperiencePage() {
 
             {/* FULL SCREEN 3D SCENE */}
             <div className="absolute inset-0 w-full h-full">
-                {mode === 'infinite' ? <MainScene /> : <DijkstraScene />}
+                <DijkstraScene 
+                    key={algorithmKey}
+                    initialNodes={nodes}
+                    initialEdges={edges}
+                    isRunning={isAlgorithmRunning}
+                />
             </div>
 
             {/* OVERLAYS - All positioned absolutely on top of 3D scene */}
             <HUDOverlay
-                algorithmName={mode === 'dijkstra' ? "Dijkstra's Algorithm" : "Loop Iteration ∞"}
-                currentStep={mode === 'dijkstra' ? "Finding Shortest Path..." : "Running..."}
+                algorithmName="Dijkstra's Algorithm"
+                currentStep={isAlgorithmRunning ? "Finding Shortest Path..." : "Paused"}
             />
-            {mode === 'infinite' && <MinimapOverlay />}
-            {mode === 'infinite' && <BottomUIOverlay />}
 
-            {/* Mode Toggle */}
-            <div className="absolute top-32 left-6 z-20">
-                <div
-                    className="bg-black/50 backdrop-blur-sm border-2 border-yellow-400 px-4 py-2"
-                    style={{ clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)' }}
-                >
-                    <button
-                        onClick={() => setMode(mode === 'infinite' ? 'dijkstra' : 'infinite')}
-                        className="font-mono text-yellow-300 hover:text-yellow-100 transition-colors"
-                    >
-                        {mode === 'infinite' ? '🎯 Switch to Dijkstra' : '🏃 Switch to Infinite Run'}
-                    </button>
-                </div>
-            </div>
+            {/* Builder Menu */}
+            <DijkstraBuilderMenu
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={setNodes}
+                onEdgesChange={setEdges}
+                onReset={handleReset}
+                onRunAlgorithm={handleRunAlgorithm}
+                onPauseAlgorithm={handlePauseAlgorithm}
+                isRunning={isAlgorithmRunning}
+            />
 
             {/* Center status text overlay */}
-            {mode === 'dijkstra' && (
+            {isAlgorithmRunning && (
                 <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
                     FINDING SHORTEST PATH...
-                </div>
-            )}
-
-            {mode === 'infinite' && (
-                <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider pointer-events-none">
-                    RUNNING ON PATH...
                 </div>
             )}
         </div>
