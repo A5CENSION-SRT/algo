@@ -52,7 +52,7 @@ export default function ExperiencePage() {
             </div>
 
             {/* OVERLAYS - All positioned absolutely on top of 3D scene */}
-            <HUDOverlay 
+            <HUDOverlay
                 algorithmName={mode === 'dijkstra' ? "Dijkstra's Algorithm" : "Loop Iteration ∞"}
                 currentStep={mode === 'dijkstra' ? "Finding Shortest Path..." : "Running..."}
             />
@@ -61,7 +61,7 @@ export default function ExperiencePage() {
 
             {/* Mode Toggle */}
             <div className="absolute top-32 left-6 z-20">
-                <div 
+                <div
                     className="bg-black/50 backdrop-blur-sm border-2 border-yellow-400 px-4 py-2"
                     style={{ clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)' }}
                 >
