@@ -1,65 +1,153 @@
-import Image from "next/image";
+'use client';
+
+import { Scene3D } from '@/components/Scene3D';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [started, setStarted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="relative min-h-screen bg-gradient-to-br from-[#0f0f1e] via-[#1a1a2e] to-[#16213e] overflow-hidden">
+      {/* Pixel grid background effect */}
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)`,
+          backgroundSize: '20px 20px',
+        }}
+      />
+      
+      {/* Animated particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {!started ? (
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+          <div className="text-center space-y-8" style={{ animation: 'fadeIn 1s ease-out' }}>
+            <h1 
+              className="text-7xl md:text-9xl font-bold tracking-wider mb-4"
+              style={{
+                fontFamily: 'monospace',
+                textShadow: '3px 3px 0px rgba(0, 255, 255, 0.5), 6px 6px 0px rgba(255, 0, 255, 0.3), -2px -2px 0px rgba(255, 255, 0, 0.2)',
+                color: '#fff',
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Re:ZERO
+            </h1>
+            
+            <div className="space-y-4">
+              <p className="text-2xl md:text-3xl text-cyan-300 font-mono tracking-wide">
+                Starting Life in Another World
+              </p>
+              
+              <p className="text-lg md:text-xl text-purple-300 font-mono animate-pulse">
+                Press START to begin your adventure
+              </p>
+            </div>
+
+            <button
+              onClick={() => setStarted(true)}
+              className="group relative mt-12 px-16 py-6 text-2xl font-bold font-mono tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transition-all duration-300 transform hover:scale-110 hover:rotate-1 border-4 border-white shadow-2xl active:scale-95"
+              style={{
+                clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
+              }}
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <span className="relative z-10 drop-shadow-lg">START</span>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+            </button>
+
+            <div className="flex justify-center gap-4 mt-8">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-3 h-3 bg-cyan-400 animate-bounce"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                    clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : (
+        <div className="relative z-10 min-h-screen flex flex-col">
+          <div className="p-6 flex justify-between items-start flex-wrap gap-4">
+            <div 
+              className="bg-black/50 backdrop-blur-sm border-2 border-cyan-400 px-6 py-3"
+              style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)' }}
+            >
+              <h2 className="text-2xl font-mono font-bold text-cyan-300 tracking-wider">
+                SUBARU NATSUKI
+              </h2>
+              <p className="text-sm text-purple-300 font-mono mt-1">
+                Return by Death: ∞
+              </p>
+            </div>
+            
+            <div 
+              className="bg-black/50 backdrop-blur-sm border-2 border-pink-400 px-6 py-3"
+              style={{ clipPath: 'polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 15px)' }}
+            >
+              <p className="text-lg font-mono text-pink-300 tracking-wider">
+                HP: ❤️❤️❤️❤️❤️
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-1 relative">
+            <Scene3D />
+            
+            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm border-2 border-white px-8 py-2 font-mono text-white text-lg tracking-wider">
+              SUBARU
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div 
+              className="bg-black/60 backdrop-blur-sm border-2 border-green-400 p-4 max-w-4xl mx-auto"
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)' }}
+            >
+              <p className="font-mono text-green-300 text-lg leading-relaxed">
+                <span className="text-yellow-300">▶</span> Welcome to the game world! 
+                Use your mouse to rotate the camera and explore.
+              </p>
+              <div className="flex gap-4 mt-3 justify-center flex-wrap">
+                <div className="px-4 py-2 bg-blue-600/50 border border-blue-400 font-mono text-sm">
+                  [EXPLORE]
+                </div>
+                <div className="px-4 py-2 bg-purple-600/50 border border-purple-400 font-mono text-sm">
+                  [INTERACT]
+                </div>
+                <div className="px-4 py-2 bg-red-600/50 border border-red-400 font-mono text-sm">
+                  [SAVE POINT]
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }
