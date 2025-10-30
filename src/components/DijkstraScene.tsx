@@ -34,7 +34,6 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
   const [isDead, setIsDead] = useState(false);
   const [targetPosition, setTargetPosition] = useState<[number, number, number]>([-10, 0, 2]);
   const [isAlgorithmActive, setIsAlgorithmActive] = useState(isRunning);
-  const [characterSpeed, setCharacterSpeed] = useState(0.07);
   
   // Sync with external isRunning prop
   useEffect(() => {
@@ -171,7 +170,6 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
             targetPosition={targetPosition}
             onReachTarget={handleNodeReached}
             onWrongPath={handleWrongPath}
-            speed={characterSpeed}
           />
 
           {/* Ground plane - grass/forest floor */}
@@ -251,22 +249,7 @@ export function DijkstraScene({ initialNodes = [], initialEdges = [], isRunning 
         </div>
       </div>
 
-      {/* Character Speed Control */}
-      <div className="absolute bottom-6 right-6 z-20 pointer-events-auto">git
-        <div className="bg-black/80 backdrop-blur-sm border-2 border-cyan-400 p-3 rounded-md shadow-lg">
-          <p className="text-cyan-300 text-sm font-mono mb-2">Character Speed</p>
-          <input
-            type="range"
-            min={0.02}
-            max={0.25}
-            step={0.01}
-            value={characterSpeed}
-            onChange={(e) => setCharacterSpeed(parseFloat(e.target.value))}
-            className="w-64 accent-cyan-400"
-          />
-          <div className="text-xs text-white font-mono mt-1">{characterSpeed.toFixed(2)}</div>
-        </div>
-      </div>
+      {/* Character Speed Control removed */}
 
       {/* Death Overlay */}
       {isDead && (

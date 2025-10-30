@@ -223,7 +223,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
             outlineWidth={0.02}
             outlineColor="#000000"
           >
-            Distance: {node.distance === Infinity ? '-∞' : `${node.distance}`} km
+            Distance: {node.distance === Infinity ? '∞' : `${node.distance}`} km
           </Text>
 
           {/* Visited checkmark */}
