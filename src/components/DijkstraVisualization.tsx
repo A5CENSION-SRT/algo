@@ -14,6 +14,7 @@ interface Node {
   visited: boolean;
   isTarget: boolean;
   isStart: boolean;
+  previousNode?: string; // Track shortest path
 }
 
 interface Edge {
@@ -36,6 +37,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
   const [currentNode, setCurrentNode] = useState<string>('Arlam');
   const [algorithmStep, setAlgorithmStep] = useState(0);
   const [visitedNodes, setVisitedNodes] = useState<Set<string>>(new Set());
+  const [shortestPath, setShortestPath] = useState<string[]>([]); // Current shortest path
 
   // Initialize graph structure with Re:Zero locations
   useEffect(() => {
@@ -103,7 +105,8 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           if (edge && !node.visited) {
             const newDistance = minNode.distance + edge.weight;
             if (newDistance < node.distance) {
-              return { ...node, distance: newDistance };
+              // Update distance and track previous node for path reconstruction
+              return { ...node, distance: newDistance, previousNode: minNode.id };
             }
           }
           return node;
@@ -116,12 +119,38 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
     return () => clearInterval(interval);
   }, [isActive, nodes.length, edges, onReachTarget]);
 
+  // Calculate shortest path from start to current node
+  useEffect(() => {
+    const path: string[] = [];
+    let current = currentNode;
+    
+    while (current) {
+      path.unshift(current);
+      const node = nodes.find(n => n.id === current);
+      if (!node || !node.previousNode || node.isStart) break;
+      current = node.previousNode;
+    }
+    
+    setShortestPath(path);
+  }, [nodes, currentNode]);
+
   // Notify parent component of updates for minimap
   useEffect(() => {
     if (onNodesUpdate) {
       onNodesUpdate(nodes, currentNode, edges, visitedNodes);
     }
   }, [nodes, currentNode, edges, visitedNodes, onNodesUpdate]);
+
+  // Check if edge is part of current shortest path
+  const isPathEdge = (from: string, to: string): boolean => {
+    for (let i = 0; i < shortestPath.length - 1; i++) {
+      if ((shortestPath[i] === from && shortestPath[i + 1] === to) ||
+          (shortestPath[i] === to && shortestPath[i + 1] === from)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   // Calculate available paths from current node
   const getAvailablePaths = () => {
@@ -157,8 +186,8 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           
           {/* Village name label above */}
           <Text
-            position={[0, 3, 0]}
-            fontSize={0.5}
+            position={[0, 2.2, 0]}
+            fontSize={0.45}
             color={node.isStart ? '#00ff00' : node.isTarget ? '#ff0000' : '#ffffff'}
             anchorX="center"
             anchorY="middle"
@@ -172,15 +201,15 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           {currentNode === node.id && (
             <>
               <pointLight
-                position={[0, 2, 0]}
+                position={[0, 1.5, 0]}
                 color="#00ffff"
                 intensity={3}
-                distance={6}
+                distance={5}
               />
               {/* Pulsing ring */}
-              <mesh position={[0, -0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[2.5, 3, 32]} />
-                <meshBasicMaterial color="#00ffff" transparent opacity={0.5} />
+              <mesh position={[0, -0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[1.5, 1.8, 32]} />
+                <meshBasicMaterial color="#00ffff" transparent opacity={0.6} />
               </mesh>
             </>
           )}
@@ -188,12 +217,12 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           {/* Distance indicator */}
           {node.distance !== Infinity && (
             <Text
-              position={[0, -1.5, 0]}
-              fontSize={0.4}
+              position={[0, -1, 0]}
+              fontSize={0.35}
               color="#ffff00"
               anchorX="center"
               anchorY="middle"
-              outlineWidth={0.03}
+              outlineWidth={0.02}
               outlineColor="#000000"
             >
               Distance: {node.distance} km
@@ -203,8 +232,8 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
           {/* Visited checkmark */}
           {node.visited && (
             <Text
-              position={[0, 3.8, 0]}
-              fontSize={0.6}
+              position={[0, 2.8, 0]}
+              fontSize={0.5}
               color="#00ff00"
               anchorX="center"
               anchorY="middle"
@@ -223,6 +252,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
         if (!fromNode || !toNode) return null;
 
         const isVisitedEdge = visitedNodes.has(edge.from) && visitedNodes.has(edge.to);
+        const isInShortestPath = isPathEdge(edge.from, edge.to);
         
         return (
           <EdgeLine
@@ -231,6 +261,7 @@ export function DijkstraVisualization({ onLoseLife, onReachTarget, isActive, onN
             to={toNode.position}
             weight={edge.weight}
             isVisited={isVisitedEdge}
+            isShortestPath={isInShortestPath}
           />
         );
       })}
@@ -251,12 +282,14 @@ function EdgeLine({
   from, 
   to, 
   weight, 
-  isVisited 
+  isVisited,
+  isShortestPath
 }: { 
   from: [number, number, number]; 
   to: [number, number, number]; 
   weight: number;
   isVisited: boolean;
+  isShortestPath: boolean;
 }) {
   const points = [
     new THREE.Vector3(...from),
@@ -271,6 +304,29 @@ function EdgeLine({
     (from[2] + to[2]) / 2
   );
 
+  // Determine edge color and appearance based on state
+  let edgeColor = '#aaaaaa';
+  let emissiveColor = '#000000';
+  let emissiveIntensity = 0;
+  let opacity = 0.4;
+  let thickness = 0.04;
+
+  if (isShortestPath) {
+    // Shortest path - bright cyan/yellow
+    edgeColor = '#00ffff';
+    emissiveColor = '#00ffff';
+    emissiveIntensity = 0.8;
+    opacity = 1;
+    thickness = 0.12;
+  } else if (isVisited) {
+    // Visited but not on shortest path - green
+    edgeColor = '#00ff00';
+    emissiveColor = '#00ff00';
+    emissiveIntensity = 0.3;
+    opacity = 0.6;
+    thickness = 0.06;
+  }
+
   return (
     <group>
       {/* Use a tube geometry for thicker, more visible edges */}
@@ -278,18 +334,36 @@ function EdgeLine({
         <tubeGeometry args={[
           new THREE.CatmullRomCurve3(points),
           20,
-          isVisited ? 0.08 : 0.04,
+          thickness,
           8,
           false
         ]} />
         <meshStandardMaterial 
-          color={isVisited ? '#00ff00' : '#aaaaaa'}
-          emissive={isVisited ? '#00ff00' : '#000000'}
-          emissiveIntensity={isVisited ? 0.5 : 0}
+          color={edgeColor}
+          emissive={emissiveColor}
+          emissiveIntensity={emissiveIntensity}
           transparent
-          opacity={isVisited ? 0.9 : 0.4}
+          opacity={opacity}
         />
       </mesh>
+      
+      {/* Animated glow for shortest path */}
+      {isShortestPath && (
+        <mesh>
+          <tubeGeometry args={[
+            new THREE.CatmullRomCurve3(points),
+            20,
+            thickness * 1.5,
+            8,
+            false
+          ]} />
+          <meshBasicMaterial 
+            color="#ffff00"
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+      )}
       
       {/* Weight Label with background */}
       <group position={[midpoint.x, midpoint.y + 0.5, midpoint.z]}>
