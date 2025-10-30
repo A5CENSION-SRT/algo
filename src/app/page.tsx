@@ -145,15 +145,6 @@ export default function Home() {
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity" />
                 </button>
 
-                <button
-                  onClick={() => router.push('/experience')}
-                  className="px-8 py-4 text-lg font-mono bg-black/40 backdrop-blur-md border-2 border-purple-400 text-purple-300 hover:bg-purple-500/20 transition-all duration-300"
-                  style={{
-                    clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
-                  }}
-                >
-                  Watch Demo
-                </button>
               </div>
 
               {/* Feature badges */}
